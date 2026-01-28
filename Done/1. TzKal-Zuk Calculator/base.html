@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="css/base.css">
+        <title>TzKal-Zuk Calculator</title>
+    </head>
+    <body>
+        <div id="drop-odds-container">
+            <button id="drop-odds-close-button">Close</button>
+            <div id="drop-odds">
+
+            </div>
+        </div>
+        <main>
+            <section>
+                <div id="top-row-container">
+                    <button id="drop-odds-button">Odds</button>
+                    <button id="disclaimer-button">Disclaimer</button>
+                </div>
+                <div id="input-area">
+                    <p>Simulate <input id="kill-input" type="number" min= "1" max="1000" value="100"/> kill(s)</p>
+                </div>
+                <div id="toggle-area">
+                    <label for="toggle-hm">Hard Mode?</label>
+                    <input type="checkbox" id="toggle-hm"/>
+                </div>
+                <div id="button-container">
+                    <button id="simulate-button">Simulate 🖥️</button>
+                </div>
+                <div id="output-container">
+                    <div id="output-buttons">
+                        <button id="dropLog-button">Drop Log 📈</button>
+                        <button id="dataLog-button">Data Log 📊</button>
+                    </div>
+                    <div id="dropLog-output">
+                        <!-- Detailed drop out output -->
+                    </div>
+                    <div id="dataLog-output">
+                        <!-- Data output (table, with filters etc) -->
+                        <p>Data Log (🚧 Under Construction 🚧)</p>
+                        <div id="dataLog-table">
+                            <div id="dataLog-title">
+                                <div>Kill No</div>
+                                <div>Name</div>
+                                <div>Amount</div>
+                                <div>Value</div>
+                            </div>
+                            <div id="dataLog-content"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <div id="footer">
+            <div id="footerContainer">
+                <div id="profilePic">
+                    <a href="https://www.sololearn.com/Profile/100073"><img id="theImg" src="https://blob.sololearn.com/avatars/4f502f80-c497-49f5-be5b-3ee1f3be0739.jpg"/></a>
+                </div>
+                <div id="sig">
+                    <p><a href="https://www.sololearn.com/Profile/100073">Jacob</a> &copy; 1/12 (2026). Follow me:&nbsp;</p>
+                </div>
+                <div id="logos">
+                    <a href="https://www.sololearn.com/Profile/100073"><img id="slImg" src="https://blob.sololearn.com/avatars/sololearn.png"/></a>
+                    <a href="https://codepen.io/JDawson"><img id="cpenImg" src="https://res.cloudinary.com/css-tricks/images/w_600,h_600,c_fill/f_auto,q_auto/v1637703540/Button-White-Large/Button-White-Large-png?_i=AA"/></a>
+                    <a href="https://github.com/Jacob-Dawson"><img id="githubImg" src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"/></a>
+                </div>
+            </div>
+        </div>
+        <script type="module" src="./js/base.js"></script>
+        <!--<script type="module" src="./js/data.js"></script>-->
+        <!---->
+    </body>
+</html>

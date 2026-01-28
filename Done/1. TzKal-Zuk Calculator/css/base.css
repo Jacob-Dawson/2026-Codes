@@ -1,0 +1,440 @@
+@import url('your url here');
+
+:root{
+
+    font-size: 16px;
+
+}
+
+body{
+
+    font-family: 'Arial';
+    padding: 0;
+    margin: 0;
+    background-color: rgb(255, 246, 246);
+
+}
+
+/* Odds modal */
+
+#drop-odds-container{
+
+    display: none;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    width: 100%;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.25);
+
+}
+
+#drop-odds-close-button{
+
+    font-size: 1rem;
+    cursor: pointer;
+    right: 0.1rem;
+    width: 100%;
+    border: 1px solid black;
+    background-color: darkgray;
+    color: black;
+    font-weight: 700;
+    box-sizing: border-box;
+    padding: 0 1.25rem;
+    transition: all 0.35s;
+    user-select: none;
+
+}
+
+#drop-odds-close-button:hover{
+
+    background-color: black;
+    color: darkgray;
+    transition: all 0.35s;
+
+}
+
+#drop-odds{
+
+    display: block;
+    border: 1px solid black;
+    border-radius: 5px;
+    width: 300px;
+    height: 300px;
+    overflow-y: scroll;
+    background-color: white;
+    z-index: 999;
+
+}
+
+.oddsSection{
+
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+
+}
+
+.oddsTitle, .oddsSubtitle{
+
+    text-decoration: underline;
+
+}
+
+.oddsTitle{
+
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 600;
+    margin: 0.35rem 0;
+
+}
+
+.oddsSubtitle{
+
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-top: 0.3rem;
+    margin-bottom: 0.3rem;
+
+}
+
+.oddsRecord{
+
+    font-size: 0.75rem;
+    margin-top: 0.15rem;
+    margin-bottom: 0.15rem;
+
+}
+
+/* Disclaimer modal */
+
+
+
+/* main section */
+
+main{
+
+    width: 100%;
+    height: calc(100vh - 50px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#top-row-container{
+
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+}
+
+#top-row-container > button{
+
+    border: 2px solid blue;
+    color: blue;
+    font-size: 1rem;
+    background-color: white;
+    border-radius: 0.2rem;
+    font-weight: 700;
+    padding: 0.15rem 0.1rem;
+    user-select: none;
+    cursor: pointer;
+    transition: all 0.35s;
+
+}
+
+#top-row-container > button:hover{
+
+    color: white;
+    background-color: blue;
+    transition: all 0.35s;
+
+}
+
+#button-container{
+
+    width: 100%;
+    box-sizing: border-box;
+
+}
+
+#simulate-button{
+
+    width: 100%;
+    border-radius: 0.25rem;
+    font-size: 1.5rem;
+    padding: 0.125rem 0.25rem;
+    margin: 0.2rem;
+    box-sizing: border-box;
+    border: 2px solid green;
+    color: green;
+    background-color: white;
+    transition: all 0.35s;
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+
+}
+
+#simulate-button:hover{
+
+    background-color: green;
+    color: white;
+    transition: all 0.35s;
+
+}
+
+#output-buttons{
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+
+}
+
+#output-buttons > button{
+
+    width: calc(50% - 0.6rem);
+    box-sizing: border-box;
+    user-select: none;
+    border: 2px solid red;
+    background-color: white;
+    color: red;
+    font-size: 1rem;
+    font-weight: 700;
+    border-radius: 0.25rem;
+    transition: all 0.35s;
+    cursor: pointer;
+    padding: 0.2rem;
+    margin: 0.2rem;
+
+}
+
+#output-buttons > button:hover{
+
+    background-color: red;
+    color: white;
+    transition: all 0.35s;
+
+}
+
+#dropLog-output{
+
+    text-align: center;
+    overflow-y: auto;
+    display: none;
+    max-height: 300px;
+    font-size: 0.75rem;
+    text-align: left;
+
+}
+
+#dropLog-output > p{
+
+    margin-top: 0.05rem;
+    margin-bottom: 0.05rem;
+
+}
+
+.killNo{
+
+    font-size: 0.8rem;
+    font-weight: bold;
+
+}
+
+.killSection{
+
+    width: 100%;
+    border-bottom: 2px solid rgb(152, 152, 152);
+    box-sizing: border-box;
+
+}
+
+.highValueDrop{
+
+    font-weight: bold;
+
+}
+
+section{
+
+    text-align: center;
+    border: 2px solid black;
+    border-radius: 5px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    padding: 0.5rem;
+    background-color: white;
+
+}
+
+#dataLog-output{
+
+    display: none;
+    width: 100%;
+
+}
+
+#dataLog-table{
+
+    display: grid;
+    grid-template-columns: auto;
+    width: 100%;
+
+}
+
+#dataLog-title{
+
+    display: flex;
+    width: 100%;
+    border: 1px solid black;
+    overflow-y: scroll;
+
+}
+
+#dataLog-title > div {
+
+    width: 25%;
+    border:1px solid black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#dataLog-content{
+
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 300px;
+    font-size: 0.75rem;
+    border: 1px solid black;
+
+}
+
+.dataRecord{
+
+    display: flex;
+    border: 1px solid black;
+    width: 100%;
+
+}
+
+.dataRecord > div {
+
+    border: 1px solid black;
+    width: 25%;
+    word-wrap: break-word;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+}
+
+/* footer / sig */
+
+#footer{
+
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    height: 50px;
+    background-color: #a7c1fe;
+    box-sizing: border-box;
+    border-top: 3px dashed #16171c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16171c;
+    font-weight: 700;
+
+}
+
+#footerContainer{
+
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#profilePic{
+    
+    width: 30px;
+    height: 30px;
+    padding-right: 10px;
+
+}
+
+#theImg{
+
+    position: absolute;
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+    box-sizing: border-box;
+
+}
+
+#sig{
+
+    font-size: 14px;
+    letter-spacing: 0.75px;
+
+}
+
+#sig > p > a{
+
+    color: #16171c;
+    text-decoration: none;
+
+}
+
+#logos{
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 5px;
+    gap: 3px;
+    box-sizing: border-box;
+
+}
+
+#slImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#cpenImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#githubImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
