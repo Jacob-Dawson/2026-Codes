@@ -1,0 +1,346 @@
+@import url('your url here');
+
+body{
+
+    font-family: 'Arial';
+    padding: 0;
+    margin: 0;
+    background-color: white;
+
+}
+
+main{
+
+    width: 100%;
+    height: calc(100vh - 50px);
+    overflow-y: auto;
+
+}
+
+main *{
+
+    box-sizing: border-box;
+
+}
+
+#autocomplete{
+
+    cursor: pointer;
+    user-select: none;
+
+}
+
+#autocomplete > li {
+
+    list-style-type: '- ';
+    color: black;
+    background-color: white;
+    transition: all 0.2s;
+
+}
+
+#autocomplete > li:hover{
+
+    list-style-type: '- ';
+    color: white;
+    background-color: black;
+    transition: all 0.2s;
+
+}
+
+/* -- */
+
+#weather-outputs{
+
+    width: 100%;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto auto auto auto auto auto auto;
+
+}
+
+#weather-outputs > section{
+
+    border: 1px solid black;
+    border-radius: 0.25rem;
+    margin: 0.5rem;
+
+}
+
+/* primary weather */
+
+#location-info{
+
+    grid-column: 1 / 3;
+
+}
+
+#weather-warnings{
+
+    grid-column: 1 / 3;
+
+}
+
+#current-weather{
+
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    grid-column: 1 / 3;
+
+}
+
+#current-weather > div{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+
+/* weather map */
+
+#weather-map{
+
+    max-width: 100%;
+    height: 400px;
+
+}
+
+#weather-map-container{
+
+    max-width: 100%;
+    height: 335px;
+
+}
+
+/* forecast hourly section */
+
+#hour-day-view{
+
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    margin: 0 0.5rem 0.5rem 0.5rem;
+    padding: 0 0.5rem;
+    height: 280px;
+    overflow-x: auto;
+    user-select: none;
+    grid-column: 1 / 3;
+
+}
+
+#forecast-hour-container{
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: row;
+    height: 75%;
+
+}
+
+.forecast-hour{
+
+    border: 1px solid black;
+    border-radius: 0.4rem;
+    margin: 0 0.4rem;
+    padding: 0 0.4rem;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+
+}
+
+.forecast-hour *{
+
+    height: calc(100% / 4)
+
+}
+
+/* forecast day section */
+
+#forecast{
+
+    border: 1px solid black;
+    border-radius: 0.5rem;
+    margin: 0 0.5rem;
+    padding: 0 0.5rem;
+    height: 400px;
+    overflow-x: auto;
+    user-select: none;
+    grid-column: 1 / 3;
+
+}
+
+#forecast-day-container{
+
+    display: flex;
+    justify-content: flex-start;
+    align-items: stretch;
+    flex-direction: row;
+    height: 75%;
+
+}
+
+.forecast-day{
+
+    border: 1px solid black;
+    border-radius: 0.4rem;
+    margin: 0 0.4rem;
+    padding: 0 0.4rem;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    text-align: center;
+
+}
+
+.forecast-day *{
+
+    height: calc(100% / 6)
+
+}
+
+#weather-map{
+
+    grid-column: 1 / 3;
+
+}
+
+/* secondary weather */
+
+#precipitation-weather, #wind-weather, #air-quality-weather, #uv-index-weather, #sun-astrology, #moon-astrology{
+
+    text-align: center;
+
+}
+
+
+/* attribution */
+
+#attribution{
+
+    width: 100%;
+    padding: 0rem 0.5rem 0rem 0rem;
+    border-top: 1px solid black;
+    box-sizing: border-box;
+    text-align: right;
+
+}
+
+a{
+
+    text-decoration: none;
+    color: black;
+
+}
+
+a:visited{
+
+    color: black;
+
+}
+
+/* footer / sig */
+
+#footer{
+
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    height: 50px;
+    background-color: #a7c1fe;
+    box-sizing: border-box;
+    border-top: 3px dashed #16171c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16171c;
+    font-weight: 700;
+
+}
+
+#footerContainer{
+
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#profilePic{
+    
+    width: 30px;
+    height: 30px;
+    padding-right: 10px;
+
+}
+
+#theImg{
+
+    position: absolute;
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+    box-sizing: border-box;
+
+}
+
+#sig{
+
+    font-size: 14px;
+    letter-spacing: 0.75px;
+
+}
+
+#sig > p > a{
+
+    color: #16171c;
+    text-decoration: none;
+
+}
+
+#logos{
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 5px;
+    gap: 3px;
+    box-sizing: border-box;
+
+}
+
+#slImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#cpenImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#githubImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
