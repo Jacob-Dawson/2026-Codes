@@ -14,7 +14,7 @@ export function formatWeatherData(data){
 
     const weekDays = 0;
 
-    console.log(next24Hours)
+    //console.log(next24Hours)
 
     return {
         city: data.location.name,
@@ -23,6 +23,8 @@ export function formatWeatherData(data){
         temperatureF: data.current.temp_f,
         condition: data.current.condition.text,
         icon: data.current.condition.icon,
+        code: data.current.condition.code,
+        isDay: data.current.is_day,
         feelslikeC: data.current.feelslike_c,
         feelslikeF: data.current.feelslike_f,
         maxTempC: today.day.maxtemp_c,
@@ -55,7 +57,7 @@ export function formatWeatherData(data){
         windDir: data.current.wind_dir,
         // health (air quality and uv)
         airQuality: data.current.air_quality.pm2_5,
-        gbIndex: data.current.air_quality.gb_defra_index,
+        gbIndex: data.current.air_quality["gb-defra-index"],
         uv: data.current.uv,
         // astronomy
         astronomy: {
@@ -67,5 +69,103 @@ export function formatWeatherData(data){
             moonIllumination: today.astro.moon_illumination
         }
     }
+
+}
+
+export function formatLocation(loc){
+
+    return `📍 ${loc.city}, ${loc.country}`
+
+}
+
+export function formatWeatherDetails(weather){
+
+    return `<img src="${weather.icon}"/> <p>${weather.condition}</p>`
+
+}
+
+export function formatDate(date){
+
+    return new Date(date).toLocaleDateString("en-US", {
+        weekday: "short",
+        day: "numeric",
+        month: "numeric"
+    })
+
+}
+
+export function formatTime(time){
+
+    return new Date(time).toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit"
+    })
+
+}
+
+export function calcChanceOfRain(chance){
+
+    return `${Math.round(chance / 10)*10}%`
+
+}
+
+export function formatTemp(tempC,tempF,units){
+
+    return `${units == "metric" ? Math.round(Number(tempC))+'°C' : Math.round(Number(tempF))+'°F'}`
+
+}
+
+export function formatPrecipitation(precipMm,precipIn,units){
+
+    return `${units == "metric" ? Math.round(Number(precipMm))+' mm' : Math.round(Number(precipIn))+' in'}`
+
+}
+
+export function formatWindSpeed(windMph,windKph,units){
+
+    return `${units == "metric" ? Math.round(Number(windKph))+' kph' : Math.round(Number(windMph))+' mph'}`
+
+}
+
+export function formatWindDirection(windDir,windDeg){
+
+    return `From: ${windDir} (${windDeg}°)`
+
+}
+
+export function getAirQualityLabel(index){
+
+    let result = "";
+
+    if(index <= 3) result = "Low"
+    else if(index <= 6) result = "Moderate"
+    else if(index <= 9) result = "High"
+    else result = "Very High"
+
+    return `${index+" ("+result+")"}`
+
+}
+
+export function formatUVIndex(uv){
+
+    return `UV Index: ${Math.round(4*(uv))}`
+
+}
+
+export function formatSunAstronomy(astronomy){
+
+    return `
+        <p>Sunrise: ${astronomy.sunrise}</p>
+        <p>Sunset: ${astronomy.sunset}</p>
+    `
+
+}
+
+export function formatMoonAstronomy(astronomy){
+
+    return `
+        <p>Moon phase: ${astronomy.moonPhase}</p>
+        <p>Moon Illumination: ${Number(astronomy.moonIllumination)/100 * 100}%</p>
+    `
 
 }

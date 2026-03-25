@@ -1,5 +1,7 @@
 // Renders the weather forecast
 
+import {formatDate, calcChanceOfRain, formatTemp} from "../utils/formatData.js"
+
 export function renderForecast(weather){
 
     const units = "metric";
@@ -8,19 +10,25 @@ export function renderForecast(weather){
     //const days = data.forecast.forecastday
     
     forecastContainer.innerHTML = `
-        <h3>📅 7-Day Forecast</h3>
+        <h3>📅 3-Day Forecast</h3>
         <div id="forecast-day-container">
-            ${weather.forecast.map(day => `
-                <div class="forecast-day">
-                    <p>${new Date(day.date).toString().split(" ")[2] == (new Date().toString().split(" ")[2]) ? "Today" : new Date(day.date).toString().split(" ")[0]}</p>
-                    <p>${new Date(day.date).getMonth()+1}/${new Date(day.date).getDate()}</p>`
-                    //<p>${day.condition}</p>
-                    +`<img src="${day.icon}"/>
-                    <p>${Math.round(day.chanceOfRain / 10)*10}%</p>
-                    <p>${units == "metric" ? Math.round(Number(day.maxTempC))+'°C' : Math.round(Number(day.maxTempF))+'°F'}</p>
-                    <p>${units == "metric" ? Math.round(Number(day.minTempC))+'°C' : Math.round(Number(day.minTempF))+'°F'}</p>
-                </div>`
+            ${weather.forecast.map((day,index) => createForecastDayHTML(day,index,units)
             ).join("")}
+        </div>`
+
+}
+
+function createForecastDayHTML(day,index,units){
+
+    return `
+        <div class="forecast-day">
+            <p>${index === 0 ? "Today" : formatDate(day.date).split(" ")[0].slice(0,-1)}</p>
+            <p>${formatDate(day.date).split(" ")[1]}</p>`
+            //<p>${day.condition}</p>
+            +`<img src="${day.icon}"/>
+            <p>${calcChanceOfRain(day.chanceOfRain)}</p>
+            <p>${formatTemp(day.maxTempC,day.maxTempF,units)}</p>
+            <p>${formatTemp(day.minTempC,day.minTempF,units)}</p>
         </div>`
 
 }

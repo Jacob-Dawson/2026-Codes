@@ -11,6 +11,8 @@ import { renderPrecipitation } from "./ui/renderPrecipitation.js"
 import { renderWind } from "./ui/renderWind.js"
 import { formatWeatherData } from "./utils/formatData.js"
 import { renderWeatherMap } from "./ui/renderWeatherMap.js"
+import { renderAlerts } from "./ui/renderAlerts.js"
+import { applyWeatherTheme } from "./ui/applyWeatherTheme.js"
 
 const searchForm = document.querySelector("#search-form")
 const input = document.querySelector("#city-input")
@@ -30,9 +32,9 @@ window.addEventListener("load", () => {
 async function loadWeatherFromCoords(lat, lon) {
 
     const data = await fetchWeatherByCoords(lat, lon)
-
     const weather = formatWeatherData(data)
 
+    renderAlerts(data.alerts.alert)
     renderCurrentWeather(weather)
     renderForecast(weather)
     renderForecastHour(weather.forecastHour)
@@ -41,8 +43,27 @@ async function loadWeatherFromCoords(lat, lon) {
     renderHealth(weather)
     renderAstronomy(weather)
     renderWeatherMap(data.location.lat, data.location.lon)
+    applyWeatherTheme(weather)
     
 }
+
+searchForm.addEventListener("submit", async (e) =>{
+
+    e.preventDefault();
+
+    if(input.value.length < 3){
+
+        return
+
+    }
+
+    const locations = await searchLocations(input.value)
+
+    results.innerHTML = locations
+        .map(loc => `<li data-city="${loc.name}">${loc.name}, ${loc.country}</li>`)
+        .join("")
+
+})
 
 searchForm.addEventListener("input", async () => {
 
@@ -70,6 +91,7 @@ results.addEventListener("click", async (e) => {
         const data = await getWeather(city)
         const weather = formatWeatherData(data)
 
+        renderAlerts(data.alerts.alert)
         renderCurrentWeather(weather)
         renderForecast(weather)
         renderForecastHour(weather.forecastHour)
@@ -78,8 +100,7 @@ results.addEventListener("click", async (e) => {
         renderHealth(weather)
         renderAstronomy(weather)
         renderWeatherMap(data.location.lat, data.location.lon)
-
-        console.log(data);
+        applyWeatherTheme(weather)
 
     } catch (error){
 

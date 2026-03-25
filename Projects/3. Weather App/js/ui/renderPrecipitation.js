@@ -1,5 +1,7 @@
 // Renders the precipitation (rain etc)
 
+import { formatPrecipitation } from "../utils/formatData.js"
+
 export function renderPrecipitation(weather){
 
     const units = "imperial"
@@ -7,8 +9,7 @@ export function renderPrecipitation(weather){
 
     precipitationWeather.innerHTML = `
         <h3>☔ Precipitation</h3>
-        <p>${units == "metric" ? Math.round(Number(weather.precipMm))+' mm' : Math.round(Number(weather.precipIn))+' in'}</p>
-
+        <p>${formatPrecipitation(weather.precipMm,weather.precipIn,units)}</p>
     `
 
 }

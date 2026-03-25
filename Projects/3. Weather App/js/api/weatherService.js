@@ -6,7 +6,7 @@ const BASE_URL = "https://api.weatherapi.com/v1"
 export async function fetchWeatherByCoords(lat, lon){
 
     const response = await fetch(
-        `${BASE_URL}/forecast.json?key=${API_KEY}&q=${lat},${lon}&days=8&aqi=yes`
+        `${BASE_URL}/forecast.json?key=${API_KEY}&q=${lat},${lon}&days=3&aqi=yes&alerts=yes`
     )
     
     if(!response.ok){
@@ -22,7 +22,7 @@ export async function fetchWeatherByCoords(lat, lon){
 export async function getWeather(city){
 
     const response = await fetch(
-        `${BASE_URL}/forecast.json?key=${API_KEY}&q=${city}&days=8&aqi=yes`
+        `${BASE_URL}/forecast.json?key=${API_KEY}&q=${city}&days=3&aqi=yes&alerts=yes`
     )
 
     if(!response.ok){

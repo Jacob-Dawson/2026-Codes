@@ -1,4 +1,5 @@
 // Renders the Wind
+import { formatWindDirection, formatWindSpeed } from "../utils/formatData.js"
 
 export function renderWind(weather){
 
@@ -7,9 +8,8 @@ export function renderWind(weather){
 
     windWeather.innerHTML = `
         <h3>💨 Wind</h3>
-        <p>${units == "metric" ? Math.round(Number(weather.windKph))+' kph' : Math.round(Number(weather.windMph))+' mph'}</p>
-        <p>From: ${weather.windDir + ' ('+ weather.windDegree +'°)'} </p>
-
+        <p>${formatWindSpeed(weather.windMph,weather.windKph,units)}</p>
+        <p>${formatWindDirection(weather.windDir,weather.windDegree)}</p>
     `
 
 }

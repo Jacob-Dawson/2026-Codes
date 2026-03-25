@@ -14,15 +14,17 @@
     <body>
         <main>
             <form id="search-form">
-                <input id="city-input" placeholder="Enter city" />
-                <ul id="autocomplete"></ul>
-                <button>Search</button>
+                <label for="city-input"></label>
+                <input type="text" id="city-input" placeholder="Enter city" />
+                <button type="submit">Search</button>
             </form>
-
+            <div id="form-output">
+                <ul id="autocomplete"></ul>
+            </div>
+            <section id="current-weather"></section>
+            <section id="weather-warning"></section>
             <section id="weather-outputs">
-                <section id="location-info"></section>
-                <section id="weather-warnings"></section>
-                <section id="current-weather"></section>
+                <!--<section id="location-info"></section>-->
                 <section id="hour-day-view"></section>
                 <section id="forecast"></section>
                 <section id="weather-map">
@@ -41,7 +43,7 @@
                 <p><a href="https://www.weatherapi.com">Powered by WeatherAPI.com</a></p>
             </section>
         </main>
-        <script type="module" src="./js/base.js"></script>
+        <script type="module" src="./js/base.js" defer></script>
         <div id="footer">
             <div id="footerContainer">
                 <div id="profilePic">

@@ -1,5 +1,7 @@
 // Renders the astronomy (moon etc)
 
+import { formatSunAstronomy, formatMoonAstronomy } from "../utils/formatData.js"
+
 export function renderAstronomy(weather){
 
     const sunAstrology = document.querySelector("#sun-astrology")
@@ -7,14 +9,12 @@ export function renderAstronomy(weather){
 
     sunAstrology.innerHTML = `
         <h3>🌅 Sun</h3>
-        <p>Sunrise: ${weather.astronomy.sunrise}</p>
-        <p>Sunset: ${weather.astronomy.sunset}</p>
+        <div>${formatSunAstronomy(weather.astronomy)}</div>
     `
 
     moonAstrology.innerHTML = `
         <h3>🌃 Moon</h3>
-        <p>Moon phase: ${weather.astronomy.moonPhase}</p>
-        <p>Moon Illumination: ${Number(weather.astronomy.moonIllumination)/100 * 100}%</p>
+        <div>${formatMoonAstronomy(weather.astronomy)}</div>
     `
 
 }
