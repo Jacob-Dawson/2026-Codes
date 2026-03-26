@@ -89,4 +89,35 @@ export function applyWeatherTheme(weather) {
         }
 
     }
+
+    const forecastDay = document.getElementsByClassName("forecast-day");
+    const currentWeather = document.getElementById("current-weather");
+
+    for(let i=0; i<forecastDay.length; i++){
+
+        if(isDay === 1){
+
+            forecastDay[i].style.color = "var(--col-section-day)"
+            forecastDay[i].style.background = "var(--bg-col-section-day)"
+            forecastDay[i].style.borderColor = "var(--col-section-day)"
+
+        } else if(isDay === 0){
+
+            forecastDay[i].style.color = "var(--col-section-night)"
+            forecastDay[i].style.background = "var(--bg-col-section-night)"
+            forecastDay[i].style.borderColor = "var(--border-forecastDay-col)"
+            
+        }
+
+    }
+
+    if(isDay === 1){
+
+        currentWeather.style.color = "var(--col-section-day)"
+
+    } else if(isDay === 0){
+
+        currentWeather.style.color = "var(--col-section-night)"
+
+    }
 }

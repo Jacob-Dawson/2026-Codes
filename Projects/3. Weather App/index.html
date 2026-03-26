@@ -13,6 +13,7 @@
     </head>
     <body>
         <main>
+            <button id="open-locations" class="back-btn">←</button>
             <form id="search-form">
                 <label for="city-input"></label>
                 <input type="text" id="city-input" placeholder="Enter city" />
@@ -43,6 +44,31 @@
                 <p><a href="https://www.weatherapi.com">Powered by WeatherAPI.com</a></p>
             </section>
         </main>
+        <div id="locations-section" class="hidden">
+            <div class="locations-header">
+                <button id="locations-back">←</button>
+                <h2>Locations</h2>
+            </div>
+            <div class="locations-content">
+                <div id="current-location-container">
+                    <h3>Current Location</h3>
+                </div>
+                <div id="saved-locations-container">
+                    <h3>Saved Locations</h3>
+                </div>
+            </div>
+            <button id="open-search" class="floating-btn">🔍</button>
+        </div>
+        <div id="context-menu" class="hidden">
+            <button id="remove-city-btn">Remove City</button>
+        </div>
+        <div id="search-overlay" class="hidden">
+            <div class="search-header">
+                <button id="search-back">←</button>
+                <input type="text" id="search-input" placeholder="Search location..."/>
+            </div>
+            <ul id="search-results"></ul>
+        </div>
         <script type="module" src="./js/base.js" defer></script>
         <div id="footer">
             <div id="footerContainer">
