@@ -26,9 +26,9 @@ import { openLocations, closeLocations } from "./ui/locationsSection.js"
 import { renderLocations } from "./ui/renderLocations.js"
 import { openSearchOverlay, closeSearchOverlay } from "./ui/searchOverlay.js";
 
-const searchForm = document.querySelector("#search-form")
-const input = document.querySelector("#city-input")
-const results = document.querySelector("#autocomplete")
+//const searchForm = document.querySelector("#search-form")
+//const input = document.querySelector("#city-input")
+//const results = document.querySelector("#autocomplete")
 
 
 window.addEventListener("load", () => {
@@ -71,14 +71,14 @@ document.addEventListener("DOMContentLoaded",async () => {
     })
 
     // close overlay
-    const backBtn = document.querySelector("#locations-back")
+    /*const backBtn = document.querySelector("#locations-back")
     if(backBtn) backBtn.addEventListener("click", () => {
 
         closeLocations()
 
-    })
+    })*/
     
-    console.log("Locations overlay ready")
+    //console.log("Locations overlay ready")
 
     const searchBtn = document.querySelector("#open-search")
     if(searchBtn){
@@ -110,7 +110,7 @@ async function loadSavedLocationsWeather(locations){
 
     if(cached && (Date.now() - cached.timestamp < CACHE_DURATION)){
 
-        console.log("Using fresh cache")
+        //console.log("Using fresh cache")
         return cached.data
 
     }
@@ -125,11 +125,15 @@ async function loadSavedLocationsWeather(locations){
             const weather = formatWeatherData(data)
 
             updatedLocations.push({
-                name: data.location.name,
-                temp_c: data.current.temp_c,
+                name: weather.city,
+                temp: {
+                    temp: weather.temperatureC,
+                    tempMin: weather.minTempC,
+                    tempMax: weather.maxTempC
+                },
                 condition: {
-                    text: data.current.condition.text,
-                    icon: data.current.condition.icon
+                    text: weather.condition,
+                    icon: weather.icon
                 }
             });
 
@@ -180,11 +184,15 @@ async function loadWeather(locationName){
 
     // update current location
     selectedLocation = {
-        name: weather.name || data.location.name,
-        temp_c: weather.temp_c || weather.current?.temp_c || data.current.temp_c,
+        name: weather.city,
+        temp: {
+            temp: weather.temperatureC,
+            tempMin: weather.minTempC,
+            tempMax: weather.maxTempC
+        },
         condition: {
-            text: weather.condition?.text || weather.current?.condition?.text || data.current.condition.text,
-            icon: weather.condition?.icon || weather.current?.condition?.icon || data.current.condition.icon
+            text: weather.condition,
+            icon: weather.icon
         }
     }
 
@@ -212,11 +220,15 @@ async function loadWeatherFromCoords(lat, lon) {
 
     // update current location
     currentLocation = {
-        name: weather.name || data.location.name,
-        temp_c: weather.temp_c || weather.current?.temp_c || data.current.temp_c,
+        name: weather.city,
+        temp: {
+            temp: weather.temperatureC,
+            tempMin: weather.minTempC,
+            tempMax: weather.maxTempC
+        },
         condition: {
-            text: weather.condition?.text || weather.current?.condition?.text || data.current.condition.text,
-            icon: weather.condition?.icon || weather.current?.condition?.icon || data.current.condition.icon
+            text: weather.condition,
+            icon: weather.icon
         }
     }
 
@@ -256,13 +268,18 @@ searchResultsOverlay.addEventListener("click", async (e) => {
 
     // fetch real weather
     const data = await getWeather(city)
+    const weather = formatWeatherData(data)
 
     const newLocation = {
-        name: data.location.name,
-        temp_c: data.current.temp_c,
+        name: weather.city,
+        temp: {
+            temp: weather.temperatureC,
+            tempMin: weather.minTempC,
+            tempMax: weather.maxTempC
+        },
         condition: {
-            text: data.current.condition.text,
-            icon: data.current.condition.icon
+            text: weather.condition,
+            icon: weather.icon
         }
     }
 
@@ -282,7 +299,7 @@ searchResultsOverlay.addEventListener("click", async (e) => {
 
 })
 
-searchForm.addEventListener("submit", async (e) =>{
+/*searchForm.addEventListener("submit", async (e) =>{
 
     e.preventDefault();
 
@@ -298,9 +315,9 @@ searchForm.addEventListener("submit", async (e) =>{
         .map(loc => `<li data-city="${loc.name}">${loc.name}, ${loc.country}</li>`)
         .join("")
 
-})
+})*/
 
-searchForm.addEventListener("input", async () => {
+/*searchForm.addEventListener("input", async () => {
 
     if(input.value.length < 3){
 
@@ -313,9 +330,9 @@ searchForm.addEventListener("input", async () => {
     results.innerHTML = locations
         .map(loc => `<li data-city="${loc.name}">${loc.name}, ${loc.country}</li>`)
         .join("")
-})
+})*/
 
-results.addEventListener("click", async (e) => {
+/*results.addEventListener("click", async (e) => {
 
     input.value = e.target.dataset.city
 
@@ -331,4 +348,4 @@ results.addEventListener("click", async (e) => {
 
     }
 
-})
+})*/

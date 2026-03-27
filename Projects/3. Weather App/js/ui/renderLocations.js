@@ -4,10 +4,17 @@ export function createLocationCard(location){
 
     return `
         <div class="location-card" data-name="${location.name}">
-            <h4>${location.name}</h4>
-            <p>${location.condition.text}</p>
-            <img src="${location.condition.icon}" alt="${location.condition.text}">
-            <span>${location.temp_c}°</span>
+            <div>
+                <img src="${location.condition.icon}" alt="${location.condition.text}">
+            </div>
+            <div>
+                <h4>${location.name}</h4>
+                <p>${location.condition.text}</p>
+                <p>${Math.round(location.temp.tempMax)}° ${Math.round(location.temp.tempMin)}°</p>
+            </div>
+            <div>
+                <span>${Math.round(location.temp.temp)}°</span>
+            </div>
         </div>`
 
 }
@@ -16,9 +23,12 @@ export function renderLocations(current,saved,onSelectLocation){
 
     // current location
     const currentContainer = document.querySelector("#current-location-container")
+    
+    currentContainer.innerHTML = `<h3>Current Location</h3>`
+    
     if(currentContainer && current && current.name){
 
-        currentContainer.innerHTML = createLocationCard(current)
+        currentContainer.innerHTML += createLocationCard(current)
         
         const currentCard = currentContainer.querySelector(".location-card")
 
@@ -34,7 +44,7 @@ export function renderLocations(current,saved,onSelectLocation){
 
     } else if(currentContainer) {
 
-        currentContainer.innerHTML = "<p>No current location</p>"
+        currentContainer.innerHTML += "<p>No current location</p>"
 
     }
 
@@ -42,17 +52,19 @@ export function renderLocations(current,saved,onSelectLocation){
     // saved locations
     const savedContainer = document.querySelector("#saved-locations-container")
     
+    savedContainer.innerHTML = `<h3>Saved Locations</h3>`
+    
     if(savedContainer){
         
         const validSaved = saved.filter(loc => loc && loc.name)
 
         if(validSaved.length > 0){
 
-            savedContainer.innerHTML = validSaved.map(createLocationCard).join("")
+            savedContainer.innerHTML += validSaved.map(createLocationCard).join("")
 
         } else {
 
-            savedContainer.innerHTML = "<p>No saved locations</p>"
+            savedContainer.innerHTML += "<p>No saved locations</p>"
 
         }
 
@@ -76,6 +88,6 @@ export function renderLocations(current,saved,onSelectLocation){
 
     }
 
-    console.log("Locations rendered", {current, saved})
+    //console.log("Locations rendered", {current, saved})
 
 }
