@@ -26,10 +26,74 @@ export function setupContextMenu(savedLocations,renderLocations,currentLocation,
 
         currentRightClickedLocation = card.dataset.name
 
-        // position the menu near cursor
+         // position the menu near cursor
         contextMenu.style.top = e.pageY + "px"
         contextMenu.style.left = e.pageX + "px"
         contextMenu.classList.remove("hidden")
+
+        const removeBtn = document.querySelector("#remove-city-btn")
+        const moveUpBtn = document.querySelector("#move-up-btn")
+        const moveDownBtn = document.querySelector("#move-down-btn")
+
+        // remove city on button click
+        removeBtn.onclick = () => {
+
+            const index = savedLocations.findIndex(loc => loc.name === currentRightClickedLocation)
+
+            if(index > -1){
+
+                savedLocations.splice(index,1)
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({data: savedLocations, timestamp: Date.now()}))
+                renderLocations(currentLocation,savedLocations,handleLocationSelect)
+
+            }
+
+            contextMenu.classList.add("hidden");
+            currentRightClickedLocation = null
+
+        }
+
+        // move up
+        moveUpBtn.onclick = () => {
+
+            const index = savedLocations.findIndex(loc => loc.name === currentRightClickedLocation)
+
+            if(index > 0){
+
+                [savedLocations[index - 1], savedLocations[index]] = [savedLocations[index], savedLocations[index - 1]]
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({data: savedLocations, timestamp: Date.now()}))
+                renderLocations(currentLocation,savedLocations,handleLocationSelect)
+
+            }
+
+            contextMenu.classList.add("hidden")
+            currentRightClickedLocation = null
+
+        }
+
+        // move down
+        moveDownBtn.onclick = () => {
+
+            const index = savedLocations.findIndex(loc => loc.name === currentRightClickedLocation)
+
+            if(index < savedLocations.length - 1){
+
+                [savedLocations[index + 1], savedLocations[index]] = [savedLocations[index], savedLocations[index + 1]]
+                localStorage.setItem(STORAGE_KEY, JSON.stringify({data: savedLocations, timestamp: Date.now()}))
+                renderLocations(currentLocation,savedLocations,handleLocationSelect)
+
+            }
+
+            contextMenu.classList.add("hidden")
+            currentRightClickedLocation = null
+
+        }
+
+        // hide / show based on position
+        moveUpBtn.style.display = (savedLocations.findIndex(loc => loc.name === currentRightClickedLocation) === 0) ? "none" : "block"
+        moveDownBtn.style.display = (savedLocations.findIndex(loc => loc.name === currentRightClickedLocation) === savedLocations.length - 1) ? "none" : "block"
+
+       
 
     })
 
@@ -38,34 +102,6 @@ export function setupContextMenu(savedLocations,renderLocations,currentLocation,
     document.addEventListener("click", () => {
 
         contextMenu.classList.add("hidden");
-
-    })
-
-    // remove city on menu click
-    const removeBtn = document.querySelector("#remove-city-btn")
-    removeBtn.addEventListener("click", () => {
-
-        if(!currentRightClickedLocation) return
-
-        // remove from savedLocations
-        const index = savedLocations.findIndex(loc => loc.name === currentRightClickedLocation)
-        if(index > -1){
-
-            savedLocations.splice(index,1)
-
-        }
-
-        // update localStorage
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-            data: savedLocations,
-            timestamp: Date.now()
-        }))
-
-        // re-render overlay
-        renderLocations(currentLocation,savedLocations,handleLocationSelect)
-
-        contextMenu.classList.add("hidden")
-        currentRightClickedLocation = null
 
     })
 

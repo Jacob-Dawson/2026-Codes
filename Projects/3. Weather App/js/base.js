@@ -1,5 +1,19 @@
 // main controller of the project - connects the API to the UI
 
+const loader = document.querySelector("#app-loader")
+
+function showloader(){
+
+    loader.style.display = "flex"
+
+}
+
+function hideloader(){
+
+    loader.style.display = "none"
+
+}
+
 const STORAGE_KEY = "savedLocationsWeather"
 const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
 let currentLocation;
@@ -30,15 +44,39 @@ import { openSearchOverlay, closeSearchOverlay } from "./ui/searchOverlay.js";
 //const input = document.querySelector("#city-input")
 //const results = document.querySelector("#autocomplete")
 
+//
+window.addEventListener("load", async () => {
 
-window.addEventListener("load", () => {
+    showloader()
 
-    navigator.geolocation.getCurrentPosition((position) => {
+    try {
+
+        const position = await new Promise((resolve, reject) => {
+
+            navigator.geolocation.getCurrentPosition(resolve,reject)
+
+        })
+
         const lat = position.coords.latitude
         const lon = position.coords.longitude
 
-        loadWeatherFromCoords(lat,lon)
-    })
+        await loadWeatherFromCoords(lat,lon)
+
+        savedLocations = await loadSavedLocationsWeather(savedLocations)
+
+        renderLocations(currentLocation,savedLocations,handleLocationSelect)
+
+    } catch (err){
+
+        console.error("App failed to load:", err)
+
+    } finally {
+
+        hideloader()
+
+    }
+
+    
 
 })
 
