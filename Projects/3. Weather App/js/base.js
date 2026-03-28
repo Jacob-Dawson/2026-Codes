@@ -1,27 +1,5 @@
 // main controller of the project - connects the API to the UI
 
-const loader = document.querySelector("#app-loader")
-
-function showloader(){
-
-    loader.style.display = "flex"
-
-}
-
-function hideloader(){
-
-    loader.style.display = "none"
-
-}
-
-const STORAGE_KEY = "savedLocationsWeather"
-const CACHE_DURATION = 10 * 60 * 1000; // 10 minutes
-let currentLocation;
-let selectedLocation;
-let savedLocations = []
-const searchInputOverlay = document.querySelector("#search-input")
-const searchResultsOverlay = document.querySelector("#search-results")
-
 import { setupContextMenu } from "./ui/contextMenu.js";
 import { searchLocations } from "./api/locationService.js"
 import { getWeather, fetchWeatherByCoords } from "./api/weatherService.js"
@@ -40,7 +18,38 @@ import { openLocations, closeLocations } from "./ui/locationsSection.js"
 import { renderLocations } from "./ui/renderLocations.js"
 import { openSearchOverlay, closeSearchOverlay } from "./ui/searchOverlay.js";
 
-//
+// state
+const state = {
+    currentLocation: null,
+    selectedLocation: null,
+    savedLocations: []
+}
+
+const STORAGE_KEY = "savedLocationsWeather"
+const CACHE_DURATION = 10 * 60 * 1000;
+
+// DOM
+
+const loader = document.querySelector("#app-loader")
+const searchInputOverlay = document.querySelector("#search-input")
+const searchResultsOverlay = document.querySelector("#search-results")
+
+// Loader
+
+function showloader(){
+
+    loader.style.display = "flex"
+
+}
+
+function hideloader(){
+
+    loader.style.display = "none"
+
+}
+
+// Initial Load
+
 window.addEventListener("load", async () => {
 
     showloader()
@@ -53,14 +62,22 @@ window.addEventListener("load", async () => {
 
         })
 
-        const lat = position.coords.latitude
-        const lon = position.coords.longitude
-
+        const { latitude: lat, longitude: lon } = position.coords
         await loadWeatherFromCoords(lat,lon)
 
-        savedLocations = await loadSavedLocationsWeather(savedLocations)
+        // Load saved locations from cache or default
+        const initialLocations = [
+            {name: "Luton"},
+            {name: "Budapest"},
+            {name: "London"}
+        ]
 
-        renderLocations(currentLocation,savedLocations,handleLocationSelect)
+        // loading weather data for saved locations
+        const loadedLocations = await loadSavedLocationsWeather(initialLocations)
+        state.savedLocations = loadedLocations
+
+        renderLocations(state.selectedLocation || state.currentLocation,handleLocationSelect)
+        setupContextMenu(state.savedLocations, renderLocationsWrapper, state.selectedLocation || state.currentLocation, STORAGE_KEY, handleLocationSelect, updateSavedLocationsOrder);
 
     } catch (err){
 
@@ -72,62 +89,66 @@ window.addEventListener("load", async () => {
 
     }
 
-    
-
 })
 
-document.addEventListener("DOMContentLoaded",async () => {
-    // Current + saved locations example
+// DOMContent Loaded
 
-    savedLocations = [
-        {name: "Luton"},
-        {name: "Budapest"},
-        {name: "London"}
-    ]
-
-    // loading weather data for saved locations
-    savedLocations = await loadSavedLocationsWeather(savedLocations)
-
-    // initial render
-    renderLocations(currentLocation, savedLocations, handleLocationSelect)
-    setupContextMenu(savedLocations, renderLocations, currentLocation, STORAGE_KEY, handleLocationSelect);
-
-    // open overlay example
+document.addEventListener("DOMContentLoaded", () => {
     const openBtn = document.querySelector("#open-locations")
-    if(openBtn) openBtn.addEventListener("click", () => {
-        
-        if(currentLocation){
-            renderLocations(currentLocation,savedLocations,handleLocationSelect)
-            setupContextMenu(savedLocations, renderLocations, currentLocation, STORAGE_KEY, handleLocationSelect);
-        }
+
+    if(openBtn) openBtn.addEventListener("click",() => {
+
+        renderLocationsWrapper()
         openLocations()
 
     })
 
     const searchBtn = document.querySelector("#open-search")
-    if(searchBtn){
-
-        searchBtn.addEventListener("click", () => {
-
-            openSearchOverlay()
-
-        })
-
-    }
+    if(searchBtn) searchBtn.addEventListener("click",openSearchOverlay)
 
     const searchBack = document.querySelector("#search-back")
-    if(searchBack){
+    if(searchBack) searchBack.addEventListener("click",closeSearchOverlay)
 
-        searchBack.addEventListener("click", () => {
-
-            closeSearchOverlay()
-
-        })
-
-    }
+    searchInputOverlay.addEventListener("input",onSearchInput)
+    searchResultsOverlay.addEventListener("click",onSearchSelect)
 
 })
 
+// get the savedLocations object corresponding to current/selected location
+function getCurrentSavedLocation() {
+    const current = state.selectedLocation || state.currentLocation;
+    if (!current) return null;
+    return state.savedLocations.find(loc => loc.name === current.name) || current;
+}
+
+// Wrapper for consistent rendering
+function renderLocationsWrapper(){
+    // pick the current location from savedLocations if it exists, else currentLocation
+    const current = state.savedLocations.find(
+        loc => loc.name === (state.selectedLocation?.name)
+    ) || state.currentLocation || null;
+
+    renderLocations(current, state.savedLocations, handleLocationSelect);
+    setupContextMenu(
+        state.savedLocations,
+        renderLocationsWrapper,
+        current,
+        STORAGE_KEY,
+        handleLocationSelect,
+        updateSavedLocationsOrder
+    );
+}
+
+// syncs savedlocations order
+function updateSavedLocationsOrder(newOrder) {
+    state.savedLocations = [...newOrder];
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        data: state.savedLocations,
+        timestamp: Date.now()
+    }));
+}
+
+// Load saved Locations
 async function loadSavedLocationsWeather(locations){
 
     const cached = JSON.parse(localStorage.getItem(STORAGE_KEY))
@@ -180,6 +201,96 @@ async function loadSavedLocationsWeather(locations){
 
 }
 
+// Load Weather for a location
+async function loadWeather(locationName){
+
+    showloader()
+
+    try{
+
+        const data = await getWeather(locationName)
+        const weather = formatWeatherData(data)
+
+        renderAllWeatherSections(weather, data)
+        state.selectedLocation = {
+            name: weather.city,
+            temp: {
+                temp: weather.temperatureC,
+                tempMin: weather.minTempC,
+                tempMax: weather.maxTempC
+            },
+            condition: {
+                text: weather.condition,
+                icon: weather.icon
+            }
+        }
+        renderLocationsWrapper()
+
+    } catch (err){
+
+        console.error("Failed to load weather for",locationName,err)
+
+    } finally{
+
+        hideloader()
+
+    }
+}
+
+// Load weather from Coords
+async function loadWeatherFromCoords(lat, lon) {
+
+    showloader()
+    
+    try{
+
+        const data = await fetchWeatherByCoords(lat, lon)
+        const weather = formatWeatherData(data)
+
+        renderAllWeatherSections(weather, data)
+        state.currentLocation = {
+            name: weather.city,
+            temp: {
+                temp: weather.temperatureC,
+                tempMin: weather.minTempC,
+                tempMax: weather.maxTempC
+            },
+            condition: {
+                text: weather.condition,
+                icon: weather.icon
+            }
+        }
+        renderLocationsWrapper()
+
+    } catch (err){
+
+        console.error("Failed to load weather for",err)
+
+    } finally{
+
+        hideloader()
+
+    }
+    
+}
+
+// Render all Weather Sections
+function renderAllWeatherSections(weather,rawData){
+
+    renderAlerts(rawData.alerts?.alert)
+    renderCurrentWeather(weather)
+    renderForecast(weather)
+    renderForecastHour(weather.forecastHour)
+    renderPrecipitation(weather)
+    renderWind(weather)
+    renderHealth(weather)
+    renderAstronomy(weather)
+    renderWeatherMap(rawData.location.lat, rawData.location.lon)
+    applyWeatherTheme(weather)
+
+}
+
+// Handle Location Select
 async function handleLocationSelect(locationName){
 
     await loadWeather(locationName)
@@ -187,107 +298,33 @@ async function handleLocationSelect(locationName){
 
 }
 
-async function loadWeather(locationName){
+// Search Overlay
+async function onSearchInput(){
 
-    const data = await getWeather(locationName)
-    const weather = formatWeatherData(data)
+    const query = searchInputOverlay.value
 
-    renderAlerts(data.alerts.alert)
-    renderCurrentWeather(weather)
-    renderForecast(weather)
-    renderForecastHour(weather.forecastHour)
-    renderPrecipitation(weather)
-    renderWind(weather)
-    renderHealth(weather)
-    renderAstronomy(weather)
-    renderWeatherMap(data.location.lat, data.location.lon)
-    applyWeatherTheme(weather)
+    if(!query || query.length < 3) return
 
-    // update current location
-    selectedLocation = {
-        name: weather.city,
-        temp: {
-            temp: weather.temperatureC,
-            tempMin: weather.minTempC,
-            tempMax: weather.maxTempC
-        },
-        condition: {
-            text: weather.condition,
-            icon: weather.icon
-        }
-    }
-
-    // re-render locations overlay data
-    renderLocations(currentLocation,savedLocations,handleLocationSelect)
-    setupContextMenu(savedLocations, renderLocations, currentLocation, STORAGE_KEY, handleLocationSelect);
+    const locations = await searchLocations(query)
+    searchResultsOverlay.innerHTML = locations.map(loc => 
+        `<li data-city="${loc.name}">
+            ${loc.name}, ${loc.country}
+        </li>`
+    ).join("")
 
 }
 
-async function loadWeatherFromCoords(lat, lon) {
-
-    const data = await fetchWeatherByCoords(lat, lon)
-    const weather = formatWeatherData(data)
-
-    renderAlerts(data.alerts.alert)
-    renderCurrentWeather(weather)
-    renderForecast(weather)
-    renderForecastHour(weather.forecastHour)
-    renderPrecipitation(weather)
-    renderWind(weather)
-    renderHealth(weather)
-    renderAstronomy(weather)
-    renderWeatherMap(data.location.lat, data.location.lon)
-    applyWeatherTheme(weather)
-
-    // update current location
-    currentLocation = {
-        name: weather.city,
-        temp: {
-            temp: weather.temperatureC,
-            tempMin: weather.minTempC,
-            tempMax: weather.maxTempC
-        },
-        condition: {
-            text: weather.condition,
-            icon: weather.icon
-        }
-    }
-
-    // re-render locations overlay data
-    renderLocations(currentLocation,savedLocations,handleLocationSelect)
-    setupContextMenu(savedLocations, renderLocations, currentLocation, STORAGE_KEY, handleLocationSelect);
-
-}
-
-searchInputOverlay.addEventListener("input", async () => {
-
-    if(searchInputOverlay.value.length < 3) return
-
-    const locations = await searchLocations(searchInputOverlay.value)
-
-    searchResultsOverlay.innerHTML = locations
-        .map(loc => `
-            <li data-city="${loc.name}">
-                ${loc.name}, ${loc.country}
-            </li>
-        `).join("")
-
-})
-
-searchResultsOverlay.addEventListener("click", async (e) => {
+async function onSearchSelect(e){
 
     const city = e.target.dataset.city
     if(!city) return
 
-    // prevent dupes
-    if(savedLocations.some(loc => loc.name === city)){
-
+    // no dupes
+    if(state.savedLocations.some(loc => loc.name === city)){
         closeSearchOverlay()
         return
-
     }
 
-    // fetch real weather
     const data = await getWeather(city)
     const weather = formatWeatherData(data)
 
@@ -304,18 +341,14 @@ searchResultsOverlay.addEventListener("click", async (e) => {
         }
     }
 
-    // add to array
-    savedLocations.push(newLocation)
+    state.savedLocations.push(newLocation)
 
-    // update cache
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
-        data: savedLocations,
+        data: state.savedLocations,
         timestamp: Date.now()
     }))
 
-    // update UI
-    renderLocations(currentLocation,savedLocations,handleLocationSelect)
-
+    renderLocationsWrapper()
     closeSearchOverlay()
 
-})
+}

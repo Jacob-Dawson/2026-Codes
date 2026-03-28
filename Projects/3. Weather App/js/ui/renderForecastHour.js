@@ -6,7 +6,17 @@ export function renderForecastHour(hours){
 
     const units = "metric";
     const hourDayViewContainer = document.querySelector("#hour-day-view")
-    let counter = 0;
+    
+    // guard clause
+    if(!Array.isArray(hours) || hours.length === 0){
+
+        console.error("renderForecastHour: hours data is missing or empty", hours)
+        hourDayViewContainer.innerHTML = `
+            <h3>🕗 Hourly Forecast</h3>
+            <p>Data Unavailable</p>
+        `
+        return
+    }
 
     hourDayViewContainer.innerHTML = `
         <h3>🕗 Hourly Forecast</h3>
@@ -18,13 +28,30 @@ export function renderForecastHour(hours){
 
 function createForecastHourHTML(hour,index,units){
 
+    // guard clause
+    if(!hour){
+
+        return `
+        <div class="forecast-hour">
+            <p>Unknown</p>
+            <p>Data Unavailable</p>
+        </div>`
+
+    }
+
+    // fallbacks
+    const timeText = index === 0 ? "Now" : formatTime(hour.time ?? "")
+    const iconSrc = hour.condition?.icon ?? ""
+    const conditionText = hour.condition?.text ?? "Unavailable"
+    const chanceOfRain = calcChanceOfRain(hour.chance_of_rain ?? null ) ?? "0%"
+    const temp = formatTemp(hour.temp_c ?? null, hour.temp_f ?? null, units) ?? "--"
+
     return `
         <div class="forecast-hour">
-            <p>${index === 0 ? "Now" : formatTime(hour.time)}</p>`
-            //<p>${hour.condition.text}</p>
-            +`<img src="${hour.condition.icon}"/>
-            <p>${calcChanceOfRain(hour.chance_of_rain)}</p>
-            <p>${formatTemp(hour.temp_c,hour.temp_f,units)}</p>
+            <p>${timeText}</p>
+            <img src="${iconSrc}" alt="${conditionText}"/>
+            <p>${chanceOfRain}</p>
+            <p>${temp}</p>
         </div>`
 
 }

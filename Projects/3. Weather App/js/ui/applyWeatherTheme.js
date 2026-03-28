@@ -62,62 +62,68 @@ const themes = {
 
 export function applyWeatherTheme(weather) {
 
-    const code = weather.code;
-    const isDay = weather.isDay;
+    // guard clause
+    if(!weather){
 
+        console.error("applyWeatherTheme: weather missing",weather)
+        return
+
+    }
+
+    const code = weather.code ?? null
+    const isDay = weather.isDay
+
+    // safe theme selection
     const group = getWeatherGroup(code);
-    const theme = themes[group];
+    const theme = themes[group] ?? theme.defult;
 
-    const background = isDay === 1 ? theme.day : theme.night;
+    const isDayTime = isDay === 1
+
+    const background = isDayTime ? theme.day : theme.night;
 
     document.body.style.background = background;
 
+    // cache theme values (avoid repitition)
+    const sectionColor = isDayTime
+        ? "var(--col-section-day)"
+        : "var(--col-section-night)"
+
+    const sectionBg = isDayTime
+        ? "var(--bg-col-section-day)"
+        : "var(--bg-col-section-night)"
+
+    const borderColor = isDayTime
+        ? "var(--col-section-day)"
+        : "var(--border-forecastDay-col)"
+
+    // Apply to grid sections (safe)
     const gridSections = document.querySelectorAll("#weather-outputs > section");
 
-    for(let i=0; i<gridSections.length; i++){
+    gridSections.forEach(section => {
 
-        if(isDay === 1){
+        section.style.color = sectionColor
+        section.style.background = sectionBg
 
-            gridSections[i].style.color = "var(--col-section-day)"
-            gridSections[i].style.background = "var(--bg-col-section-day)"
+    })
 
-        } else if(isDay === 0){
+    // Apply to forecast cards
+    const forecastDays = document.querySelectorAll(".forecast-day")
 
-            gridSections[i].style.color = "var(--col-section-night)"
-            gridSections[i].style.background = "var(--bg-col-section-night)"
+    forecastDays.forEach(day => {
 
-        }
+        day.style.color = sectionColor
+        day.style.background = sectionBg
+        day.style.borderColor = borderColor
 
-    }
+    })
 
-    const forecastDay = document.getElementsByClassName("forecast-day");
+    // Apply to current weather
     const currentWeather = document.getElementById("current-weather");
 
-    for(let i=0; i<forecastDay.length; i++){
+    if(currentWeather){
 
-        if(isDay === 1){
-
-            forecastDay[i].style.color = "var(--col-section-day)"
-            forecastDay[i].style.background = "var(--bg-col-section-day)"
-            forecastDay[i].style.borderColor = "var(--col-section-day)"
-
-        } else if(isDay === 0){
-
-            forecastDay[i].style.color = "var(--col-section-night)"
-            forecastDay[i].style.background = "var(--bg-col-section-night)"
-            forecastDay[i].style.borderColor = "var(--border-forecastDay-col)"
-            
-        }
+        currentWeather.style.color = sectionColor
 
     }
 
-    if(isDay === 1){
-
-        currentWeather.style.color = "var(--col-section-day)"
-
-    } else if(isDay === 0){
-
-        currentWeather.style.color = "var(--col-section-night)"
-
-    }
 }

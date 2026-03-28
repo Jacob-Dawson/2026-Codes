@@ -2,18 +2,31 @@
 
 export function createLocationCard(location){
 
+    if(!location){
+
+        return `<div class="location-card">Invalid location</div>`
+
+    }
+
+    const name = location.name ?? "Unknown"
+    const icon = location.condition?.icon ?? ""
+    const conditionText = location.condition?.text ?? "Unavailable"
+    const temp = location.temp?.temp ?? null
+    const tempMax = location.temp?.tempMax ?? null
+    const tempMin = location.temp?.tempMin ?? null
+
     return `
-        <div class="location-card" data-name="${location.name}">
+        <div class="location-card" data-name="${name}">
             <div>
-                <img src="${location.condition.icon}" alt="${location.condition.text}">
+                <img src="${icon}" alt="${conditionText}">
             </div>
             <div>
-                <h4>${location.name}</h4>
-                <p>${location.condition.text}</p>
-                <p>${Math.round(location.temp.tempMax)}° ${Math.round(location.temp.tempMin)}°</p>
+                <h4>${name}</h4>
+                <p>${conditionText}</p>
+                <p>${tempMax != null ? Math.round(tempMax) : "--"}° ${tempMin != null ? Math.round(tempMin) : "--"}°</p>
             </div>
             <div>
-                <span>${Math.round(location.temp.temp)}°</span>
+                <span>${temp != null ? Math.round(temp) : "--"}°</span>
             </div>
         </div>`
 
@@ -21,12 +34,22 @@ export function createLocationCard(location){
 
 export function renderLocations(current,saved,onSelectLocation){
 
-    // current location
     const currentContainer = document.querySelector("#current-location-container")
+    const savedContainer = document.querySelector("#saved-locations-container")
+
+    // guard clauses
+    if(!currentContainer || !savedContainer){
+
+        console.error("renderLocations: container missing")
+        return
+
+    }
+
+    // current location
     
     currentContainer.innerHTML = `<h3>Current Location</h3>`
     
-    if(currentContainer && current && current.name){
+    if(current && current.name){
 
         currentContainer.innerHTML += createLocationCard(current)
         
@@ -42,7 +65,7 @@ export function renderLocations(current,saved,onSelectLocation){
 
         }
 
-    } else if(currentContainer) {
+    } else {
 
         currentContainer.innerHTML += "<p>No current location</p>"
 
@@ -50,42 +73,41 @@ export function renderLocations(current,saved,onSelectLocation){
 
 
     // saved locations
-    const savedContainer = document.querySelector("#saved-locations-container")
+    //const savedContainer = document.querySelector("#saved-locations-container")
     
     savedContainer.innerHTML = `<h3>Saved Locations</h3>`
-    
-    if(savedContainer){
-        
-        const validSaved = saved.filter(loc => loc && loc.name)
 
-        if(validSaved.length > 0){
+    // safe array handling
+    const validSaved = Array.isArray(saved)
+        ? saved.filter(loc => loc && loc.name)
+        : []
 
-            savedContainer.innerHTML += validSaved.map(createLocationCard).join("")
+    if(validSaved.length > 0){
 
-        } else {
+        savedContainer.innerHTML += validSaved.map(createLocationCard).join("")
 
-            savedContainer.innerHTML += "<p>No saved locations</p>"
+    } else {
 
-        }
-
-        // Add click listeners for saved locations
-        const cards = savedContainer.querySelectorAll(".location-card")
-
-        cards.forEach(card => {
-
-            card.addEventListener("click", () => {
-
-                const locationName = card.dataset.name
-
-                if(onSelectLocation){
-
-                    onSelectLocation(locationName)
-
-                }
-            })
-
-        })
+        savedContainer.innerHTML += "<p>No saved locations</p>"
 
     }
+
+    // Add click listeners for saved locations
+    const cards = savedContainer.querySelectorAll(".location-card")
+
+    cards.forEach(card => {
+
+        card.addEventListener("click", () => {
+
+            const locationName = card.dataset.name
+
+            if(locationName){
+
+                onSelectLocation(locationName)
+
+            }
+        })
+
+    })
 
 }
