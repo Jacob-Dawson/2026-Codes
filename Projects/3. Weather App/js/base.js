@@ -40,10 +40,6 @@ import { openLocations, closeLocations } from "./ui/locationsSection.js"
 import { renderLocations } from "./ui/renderLocations.js"
 import { openSearchOverlay, closeSearchOverlay } from "./ui/searchOverlay.js";
 
-//const searchForm = document.querySelector("#search-form")
-//const input = document.querySelector("#city-input")
-//const results = document.querySelector("#autocomplete")
-
 //
 window.addEventListener("load", async () => {
 
@@ -108,16 +104,6 @@ document.addEventListener("DOMContentLoaded",async () => {
 
     })
 
-    // close overlay
-    /*const backBtn = document.querySelector("#locations-back")
-    if(backBtn) backBtn.addEventListener("click", () => {
-
-        closeLocations()
-
-    })*/
-    
-    //console.log("Locations overlay ready")
-
     const searchBtn = document.querySelector("#open-search")
     if(searchBtn){
 
@@ -148,7 +134,6 @@ async function loadSavedLocationsWeather(locations){
 
     if(cached && (Date.now() - cached.timestamp < CACHE_DURATION)){
 
-        //console.log("Using fresh cache")
         return cached.data
 
     }
@@ -196,8 +181,6 @@ async function loadSavedLocationsWeather(locations){
 }
 
 async function handleLocationSelect(locationName){
-
-    console.log("loading")
 
     await loadWeather(locationName)
     closeLocations()
@@ -336,54 +319,3 @@ searchResultsOverlay.addEventListener("click", async (e) => {
     closeSearchOverlay()
 
 })
-
-/*searchForm.addEventListener("submit", async (e) =>{
-
-    e.preventDefault();
-
-    if(input.value.length < 3){
-
-        return
-
-    }
-
-    const locations = await searchLocations(input.value)
-
-    results.innerHTML = locations
-        .map(loc => `<li data-city="${loc.name}">${loc.name}, ${loc.country}</li>`)
-        .join("")
-
-})*/
-
-/*searchForm.addEventListener("input", async () => {
-
-    if(input.value.length < 3){
-
-        return
-
-    }
-
-    const locations = await searchLocations(input.value)
-
-    results.innerHTML = locations
-        .map(loc => `<li data-city="${loc.name}">${loc.name}, ${loc.country}</li>`)
-        .join("")
-})*/
-
-/*results.addEventListener("click", async (e) => {
-
-    input.value = e.target.dataset.city
-
-    const city = e.target.dataset.city
-
-    try{
-        
-        loadWeather(city)
-
-    } catch (error){
-
-        console.error(error)
-
-    }
-
-})*/

@@ -88,6 +88,4 @@ export function renderLocations(current,saved,onSelectLocation){
 
     }
 
-    //console.log("Locations rendered", {current, saved})
-
 }

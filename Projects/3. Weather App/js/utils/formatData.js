@@ -14,8 +14,6 @@ export function formatWeatherData(data){
 
     const weekDays = 0;
 
-    //console.log(next24Hours)
-
     return {
         city: data.location.name,
         country: data.location.country,

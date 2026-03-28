@@ -1,7 +1,5 @@
 // context menu
 
-//import { renderLocations } from "./renderLocations";
-
 export function setupContextMenu(savedLocations,renderLocations,currentLocation, STORAGE_KEY, handleLocationSelect){
 
     const contextMenu = document.querySelector("#context-menu")
