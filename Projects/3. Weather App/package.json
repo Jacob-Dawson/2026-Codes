@@ -1,0 +1,18 @@
+{
+  "name": "3.-weather-app",
+  "version": "1.0.0",
+  "description": "A mobile-first weather application that provides real-time weather data, forecasts, and location management using the WeatherAPI.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.2",
+    "babel-jest": "^30.3.0",
+    "jest": "^30.3.0"
+  }
+}
