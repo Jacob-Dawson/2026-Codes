@@ -59,47 +59,47 @@ export function setupContextMenu(savedLocations, renderLocations, currentLocatio
     });
 
     moveUpBtn.addEventListener("click", () => {
-    const index = getIndex();
-    if(index > 0){
-        // swap
-        [savedLocations[index - 1], savedLocations[index]] = [savedLocations[index], savedLocations[index - 1]];
+        const index = getIndex();
+        if(index > 0){
+            // swap
+            [savedLocations[index - 1], savedLocations[index]] = [savedLocations[index], savedLocations[index - 1]];
 
-        // always pick the moved item from the array itself
-        currentRightClickedLocation = savedLocations[index - 1].name;
+            // always pick the moved item from the array itself
+            currentRightClickedLocation = savedLocations[index - 1].name;
 
-        // render the array with correct reference
-        renderLocations(
-            savedLocations.find(loc => loc.name === currentRightClickedLocation),
-            savedLocations,
-            handleLocationSelect
-        );
+            // render the array with correct reference
+            renderLocations(
+                savedLocations.find(loc => loc.name === currentRightClickedLocation),
+                savedLocations,
+                handleLocationSelect
+            );
 
-        if (typeof updateSavedLocationsOrder === "function") {
-            updateSavedLocationsOrder(savedLocations);
+            if (typeof updateSavedLocationsOrder === "function") {
+                updateSavedLocationsOrder(savedLocations);
+            }
         }
-    }
-    contextMenu.classList.add("hidden");
-});
+        contextMenu.classList.add("hidden");
+    });
 
-moveDownBtn.addEventListener("click", () => {
-    const index = getIndex();
-    if(index >= 0 && index < savedLocations.length - 1){
-        [savedLocations[index + 1], savedLocations[index]] = [savedLocations[index], savedLocations[index + 1]];
+    moveDownBtn.addEventListener("click", () => {
+        const index = getIndex();
+        if(index >= 0 && index < savedLocations.length - 1){
+            [savedLocations[index + 1], savedLocations[index]] = [savedLocations[index], savedLocations[index + 1]];
 
-        currentRightClickedLocation = savedLocations[index + 1].name;
+            currentRightClickedLocation = savedLocations[index + 1].name;
 
-        renderLocations(
-            savedLocations.find(loc => loc.name === currentRightClickedLocation),
-            savedLocations,
-            handleLocationSelect
-        );
+            renderLocations(
+                savedLocations.find(loc => loc.name === currentRightClickedLocation),
+                savedLocations,
+                handleLocationSelect
+            );
 
-        if (typeof updateSavedLocationsOrder === "function") {
-            updateSavedLocationsOrder(savedLocations);
+            if (typeof updateSavedLocationsOrder === "function") {
+                updateSavedLocationsOrder(savedLocations);
+            }
         }
-    }
-    contextMenu.classList.add("hidden");
-});
+        contextMenu.classList.add("hidden");
+    });
 
     document.addEventListener("click", () => {
         contextMenu.classList.add("hidden");

@@ -75,7 +75,7 @@ export function applyWeatherTheme(weather) {
 
     // safe theme selection
     const group = getWeatherGroup(code);
-    const theme = themes[group] ?? theme.defult;
+    const theme = themes[group] ?? theme.default;
 
     const isDayTime = isDay === 1
 
@@ -95,6 +95,10 @@ export function applyWeatherTheme(weather) {
     const borderColor = isDayTime
         ? "var(--col-section-day)"
         : "var(--border-forecastDay-col)"
+
+    const openLocationCol = isDayTime
+        ? "var(--col-section-day)"
+        : "var(--col-section-night)"
 
     // Apply to grid sections (safe)
     const gridSections = document.querySelectorAll("#weather-outputs > section");
@@ -123,6 +127,16 @@ export function applyWeatherTheme(weather) {
     if(currentWeather){
 
         currentWeather.style.color = sectionColor
+
+    }
+
+    // Apply for open location btn
+    const openLocations = document.querySelector("#open-locations")
+
+    if(openLocations){
+
+        openLocations.style.color = openLocationCol
+        openLocations.style.borderColor = openLocationCol
 
     }
 

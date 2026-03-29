@@ -38,7 +38,7 @@ function createAlertHTML(alert){
     const headline = alert.headline ?? "No headline"
     const event = alert.event ?? "Unknown event"
     const severity = alert.severity ?? "unknown"
-    const severityClass = alert.toLowerCase?.() || "unknown"
+    const severityClass = severity.toLowerCase?.() || "unknown"
     const description = alert.desc ?? ""
     const instruction = alert.instruction ?? "No instructions provided"
 

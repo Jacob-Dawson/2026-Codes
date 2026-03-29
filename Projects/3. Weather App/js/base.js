@@ -38,13 +38,13 @@ const searchResultsOverlay = document.querySelector("#search-results")
 
 function showloader(){
 
-    loader.style.display = "flex"
+    loader.classList.remove("fade-out")
 
 }
 
 function hideloader(){
 
-    loader.style.display = "none"
+    loader.classList.add("fade-out")
 
 }
 
@@ -76,7 +76,7 @@ window.addEventListener("load", async () => {
         const loadedLocations = await loadSavedLocationsWeather(initialLocations)
         state.savedLocations = loadedLocations
 
-        renderLocations(state.selectedLocation || state.currentLocation,handleLocationSelect)
+        renderLocations(state.currentLocation, state.savedLocations, handleLocationSelect)
         setupContextMenu(state.savedLocations, renderLocationsWrapper, state.selectedLocation || state.currentLocation, STORAGE_KEY, handleLocationSelect, updateSavedLocationsOrder);
 
     } catch (err){
@@ -114,25 +114,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 })
 
-// get the savedLocations object corresponding to current/selected location
-function getCurrentSavedLocation() {
-    const current = state.selectedLocation || state.currentLocation;
-    if (!current) return null;
-    return state.savedLocations.find(loc => loc.name === current.name) || current;
-}
-
 // Wrapper for consistent rendering
 function renderLocationsWrapper(){
-    // pick the current location from savedLocations if it exists, else currentLocation
-    const current = state.savedLocations.find(
-        loc => loc.name === (state.selectedLocation?.name)
-    ) || state.currentLocation || null;
 
-    renderLocations(current, state.savedLocations, handleLocationSelect);
+    renderLocations(state.currentLocation, state.savedLocations, handleLocationSelect);
     setupContextMenu(
         state.savedLocations,
         renderLocationsWrapper,
-        current,
+        state.currentLocation,
         STORAGE_KEY,
         handleLocationSelect,
         updateSavedLocationsOrder

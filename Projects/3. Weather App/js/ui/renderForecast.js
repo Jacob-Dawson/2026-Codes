@@ -14,8 +14,7 @@ export function renderForecast(weather){
         forecastContainer.innerHTML = `
             <h3>📅 3-Day Forecast</h3>
             <div id="forecast-day-container">
-                ${weather.forecast.map((day,index) => createForecastDayHTML(day,index,units)
-                ).join("")}
+                <p>No Data</p>
             </div>`
 
         return

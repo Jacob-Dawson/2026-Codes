@@ -12,8 +12,6 @@ export function formatWeatherData(data){
         ...tomorrow.hour.slice(0,currentHour+1)
     ]
 
-    const weekDays = 0;
-
     return {
         city: data.location.name,
         country: data.location.country,
@@ -146,7 +144,7 @@ export function getAirQualityLabel(index){
 
 export function formatUVIndex(uv){
 
-    return `UV Index: ${Math.round(4*(uv))}`
+    return `UV Index: ${Math.round(uv)}`
 
 }
 
@@ -163,7 +161,7 @@ export function formatMoonAstronomy(astronomy){
 
     return `
         <p>Moon phase: ${astronomy.moonPhase}</p>
-        <p>Moon Illumination: ${Number(astronomy.moonIllumination)/100 * 100}%</p>
+        <p>Moon Illumination: ${Number(astronomy.moonIllumination)}%</p>
     `
 
 }
