@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+        <!-- css -->
+        <link rel="stylesheet" href="css/base.css">
+        <!-- p5.js -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+        <title>Topo Map</title>
+    </head>
+    <body>
+        <main>
+            <h1>Topo Map</h1>
+
+            <div id="controls">
+                <button class="btn"        id="btn-generate">Generate</button>
+                <button class="btn"        id="btn-undo">Undo</button>
+                <button class="btn danger" id="btn-clear">Clear</button>
+                <button class="btn"        id="btn-export">Export</button>
+                <div class="sep"></div>
+                <div class="toggle-group">
+                    <button class="btn active" id="btn-peak">&#9650; Peak</button>
+                    <button class="btn"        id="btn-depression">&#9660; Depression</button>
+                </div>
+            </div>
+
+            <div id="canvas-wrap"></div>
+            <div id="legend"></div>
+            <p id="hint">
+                tap &amp; hold to sculpt &nbsp;&middot;&nbsp; longer hold = greater change<br>
+                toggle above to raise peaks or carve depressions
+            </p>
+        </main>
+        <script type="module" src="./js/index.js" defer></script>
+        <div id="footer">
+            <div id="footerContainer">
+                <div id="profilePic">
+                    <a href="https://www.sololearn.com/Profile/100073"><img id="theImg" src="https://blob.sololearn.com/avatars/4f502f80-c497-49f5-be5b-3ee1f3be0739.jpg"/></a>
+                </div>
+                <div id="sig">
+                    <p><a href="https://www.sololearn.com/Profile/100073">Jacob</a> &copy; 4/12 (2026). Follow me:&nbsp;</p>
+                </div>
+                <div id="logos">
+                    <a href="https://www.sololearn.com/Profile/100073"><img id="slImg" src="https://blob.sololearn.com/avatars/sololearn.png"/></a>
+                    <a href="https://codepen.io/JDawson"><img id="cpenImg" src="https://res.cloudinary.com/css-tricks/images/w_600,h_600,c_fill/f_auto,q_auto/v1637703540/Button-White-Large/Button-White-Large-png?_i=AA"/></a>
+                    <a href="https://github.com/Jacob-Dawson"><img id="githubImg" src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png"/></a>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

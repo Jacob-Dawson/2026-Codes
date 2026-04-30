@@ -1,0 +1,279 @@
+*, *::before, *::after { 
+    box-sizing: border-box; 
+    margin: 0; 
+    padding: 0; 
+}
+
+body {
+
+    background: #0d0c09;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+}
+
+main{
+
+    background: #0d0c09;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 12px 40px;
+    min-height: 100vh;
+    font-family: 'Georgia', serif;
+
+}
+
+h1 {
+
+    font-size: 11px;
+    font-weight: normal;
+    letter-spacing: 8px;
+    text-transform: uppercase;
+    color: #b8a070;
+    margin-bottom: 18px;
+
+}
+
+#controls {
+
+    display: flex;
+    gap: 6px;
+    margin-bottom: 13px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: stretch;
+    /* ensure buttons sit above the canvas in z-order */
+    position: relative;
+    z-index: 10;
+
+}
+
+.btn {
+
+    background: transparent;
+    border: 1px solid #2e2810;
+    color: #7a6840;
+    font: normal 10px/1 'Georgia', serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 11px 20px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    user-select: none;
+    -webkit-user-select: none;
+    /* make sure tap targets are large enough on mobile */
+    min-height: 40px;
+
+}
+
+.btn:hover  { 
+    
+    border-color: #6a5828; 
+    color: #b8a060; 
+
+}
+
+.btn:active { 
+    
+    background: #161408; 
+
+}
+
+.btn.danger { 
+    
+    border-color: #3a1808; 
+    color: #9a5838; 
+
+}
+
+.btn.danger:hover { 
+    
+    border-color: #7a2e10; 
+    color: #cc7848; 
+
+}
+
+.toggle-group {
+
+    display: flex;
+    border: 1px solid #2e2810;
+    border-radius: 2px;
+    overflow: hidden;
+
+}
+
+.toggle-group .btn {
+
+    border: none;
+    border-right: 1px solid #2e2810;
+    border-radius: 0;
+    
+}
+
+.toggle-group .btn:last-child { 
+    
+    border-right: none; 
+
+}
+
+.toggle-group .btn.active {
+
+    background: #1c180a;
+    color: #d4b860;
+
+}
+
+.sep { 
+    
+    width: 1px; 
+    background: #1e1a0a; 
+
+}
+
+#canvas-wrap {
+
+    line-height: 0;
+    /* canvas must NOT extend outside its natural box */
+    touch-action: none;
+
+}
+
+#canvas-wrap canvas {
+
+    display: block;
+    max-width: 100%;
+    height: auto;
+
+}
+
+#legend {
+
+    display: flex;
+    gap: 2px;
+    margin-top: 10px;
+    width: 640px;
+    max-width: 100%;
+
+}
+
+.ls { 
+
+    height: 7px; 
+    flex: 1; 
+    border-radius: 1px; 
+
+}
+
+#hint {
+
+    margin-top: 9px;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #2e2810;
+    text-align: center;
+    line-height: 2;
+
+}
+
+/* footer / sig */
+
+#footer{
+
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    height: 50px;
+    background-color: #a7c1fe;
+    box-sizing: border-box;
+    border-top: 3px dashed #16171c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #16171c;
+    font-weight: 700;
+    z-index: 999;
+
+}
+
+#footerContainer{
+
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#profilePic{
+    
+    width: 30px;
+    height: 30px;
+    padding-right: 10px;
+
+}
+
+#theImg{
+
+    position: absolute;
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+    box-sizing: border-box;
+
+}
+
+#sig{
+
+    font-size: 14px;
+    letter-spacing: 0.75px;
+
+}
+
+#sig > p > a{
+
+    color: #16171c;
+    text-decoration: none;
+
+}
+
+#logos{
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding-top: 5px;
+    gap: 3px;
+    box-sizing: border-box;
+
+}
+
+#slImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#cpenImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
+
+#githubImg{
+
+    border-radius: 50%;
+    max-width: 30px;
+    border: 1px solid #16171c;
+
+}
