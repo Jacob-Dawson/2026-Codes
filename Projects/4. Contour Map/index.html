@@ -4,7 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
         <!-- css -->
-        <link rel="stylesheet" href="css/base.css">
+        <link rel="stylesheet" href="css/index.css">
         <!-- p5.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
         <title>Topo Map</title>
@@ -23,6 +23,11 @@
                     <button class="btn active" id="btn-peak">&#9650; Peak</button>
                     <button class="btn"        id="btn-depression">&#9660; Depression</button>
                 </div>
+            </div>
+
+            <div id="brush-row">
+                <label for="brush-slider" id="brush-label">Brush: M</label>
+                <input type="range" id="brush-slider" min="20" max="120" value="52" step="4">
             </div>
 
             <div id="canvas-wrap"></div>

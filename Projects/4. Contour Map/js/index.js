@@ -7,11 +7,28 @@ const COLS     = 160;
 const ROWS     = 120;
 const CW       = W / COLS;
 const CH       = H / ROWS;
-const SIGMA_PX = 52;
 const MAX_HOLD = 3000;
 const MIN_H    = 0.18;
 const MAX_H    = 0.92;
 const LINE_DRK = 0.50;
+
+// Brush radius
+let sigmaPx = 52;
+
+// Hillshading light direction: NW -45' expressed as a normalised 3-vector (east, south up) space
+const RAW_LIGHT = {
+    x: -1,
+    y: -1,
+    z: 1.6
+}
+const lightLen = Math.sqrt(RAW_LIGHT.x**2 + RAW_LIGHT.y**2 + RAW_LIGHT.z**2)
+const LIGHT = {
+    x: RAW_LIGHT.x/lightLen,
+    y: RAW_LIGHT.y/lightLen,
+    z: RAW_LIGHT.z/lightLen
+}
+const SHADE_AMB = 0.38 // ambient floor
+const SHADE_STR = 0.70 // hillshade contribution on top of ambient
 
 const PALETTE = [
     [  8,  28,  78],
@@ -86,6 +103,21 @@ function doUndo() {
     state.dirty = true;
 }
 
+function doExport(sk){
+
+    // Grab the pixel data straight from the p5 canvas and trigger a download
+    try{
+        const dataURL = sk.canvas.toDataURL('image/png')
+        const a       = document.createElement("a")
+        a.href        = dataURL
+        a.download    = 'topo-map.png'
+        a.click()
+    } catch (e) {
+        console.warn('Export failed:', e)
+    }
+
+}
+
 function computeField() {
     if (state.baseField) { 
         state.field.set(state.baseField); 
@@ -93,12 +125,11 @@ function computeField() {
         state.field.fill(0.04); 
     }
 
-    const sg = (SIGMA_PX / W) * COLS;
-    const t2 = 2 * sg * sg;
-
     for (const mk of state.marks) {
         const pc = (mk.x / W) * COLS;
         const pr = (mk.y / H) * ROWS;
+        const sg = (mk.sigma / W) * COLS;
+        const t2 = 2 * sg * sg;
         for (let r = 0; r < ROWS; r++) {
             const dr2 = (r - pr) ** 2;
             for (let c = 0; c < COLS; c++) {
@@ -111,10 +142,11 @@ function computeField() {
 }
 
 function commitMark(elapsed, x, y) {
+    if(elapsed < 30) return
     const t    = Math.min(elapsed / MAX_HOLD, 1);
     const h    = MIN_H + t * (MAX_H - MIN_H);
     const sign = state.mode === 'depression' ? -1 : 1;
-    state.marks.push({ x, y, h, sign });
+    state.marks.push({ x, y, h, sign, sigma: sigmaPx });
     computeField();
     state.dirty = true;
 }
@@ -123,26 +155,57 @@ function commitMark(elapsed, x, y) {
 // RENDER INTO BUFFER
 // ─────────────────────────────────────────────
 function renderMap(sk, buf) {
+
+    // 1. Band assignment
     const bands = new Uint8Array(COLS * ROWS);
     for (let i = 0; i < state.field.length; i++) {
         bands[i] = Math.min(Math.floor(state.field[i] * N_BANDS), N_BANDS - 1);
     }
 
+    // 2. Hillshading
+
+    const shade = new Float32Array(COLS * ROWS)
+
+    for(let r = 0; r < ROWS; r++){
+
+        for(let c = 0; c < COLS; c++){
+
+            const r0 = Math.max(0, r - 1), r1 = Math.min(ROWS - 1, r + 1)
+            const c0 = Math.max(0, c - 1), c1 = Math.min(COLS - 1, c + 1)
+            const dhdx = (state.field[r * COLS + c1] - state.field[r * COLS + c0]) / (c1 - c0) * 8
+            const dhdy = (state.field[r1 * COLS + c] - state.field[r0 * COLS + c]) / (r1 - r0) * 8
+            // Surface normal: (-dhdx, -dhdy, 1) then normalised
+            const nLen = Math.sqrt(dhdx*dhdx + dhdy*dhdy + 1)
+            const dot = (-dhdx * LIGHT.x + -dhdy * LIGHT.y + LIGHT.z) / nLen
+            shade[r * COLS + c] = SHADE_AMB + SHADE_STR * Math.max(0, dot)
+
+        }
+
+    }
+
+    // 3. Fill pixel buffer
     buf.loadPixels();
     const px = buf.pixels;
 
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
             const [R,G,B] = PALETTE[bands[r*COLS+c]];
+            const s       = shade[r * COLS + c]
+            const fr      = R * s | 0
+            const fg      = G * s | 0
+            const fb      = B * s | 0
+
             for (let dy = 0; dy < CH; dy++) {
                 const rb = ((r*CH+dy)*W + c*CW) * 4;
                 for (let dx = 0; dx < CW; dx++) {
                     const i = rb + dx*4;
-                    px[i]=R; px[i+1]=G; px[i+2]=B; px[i+3]=255;
+                    px[i]=fr; px[i+1]=fg; px[i+2]=fb; px[i+3]=255;
                 }
             }
         }
     }
+
+    // 4. Contour lines
 
     for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -151,14 +214,18 @@ function renderMap(sk, buf) {
                 const bx = (c+1)*CW;
                 for (let dy = 0; dy < CH; dy++) {
                     const i = ((r*CH+dy)*W + bx)*4;
-                    px[i]=px[i]*LINE_DRK|0; px[i+1]=px[i+1]*LINE_DRK|0; px[i+2]=px[i+2]*LINE_DRK|0;
+                    px[i]=px[i]*LINE_DRK|0; 
+                    px[i+1]=px[i+1]*LINE_DRK|0; 
+                    px[i+2]=px[i+2]*LINE_DRK|0;
                 }
             }
             if (r < ROWS-1 && bands[(r+1)*COLS+c] !== b) {
                 const by = (r+1)*CH;
                 for (let dx = 0; dx < CW; dx++) {
                     const i = (by*W + c*CW+dx)*4;
-                    px[i]=px[i]*LINE_DRK|0; px[i+1]=px[i+1]*LINE_DRK|0; px[i+2]=px[i+2]*LINE_DRK|0;
+                    px[i]=px[i]*LINE_DRK|0; 
+                    px[i+1]=px[i+1]*LINE_DRK|0; 
+                    px[i+2]=px[i+2]*LINE_DRK|0;
                 }
             }
         }
@@ -166,7 +233,7 @@ function renderMap(sk, buf) {
 
     buf.updatePixels();
 
-    // ── Elevation labels ──
+    // ── 5. Elevation labels ──
     // Each band boundary = a contour line at a known elevation (0–1300 m in 100 m steps).
     // We collect boundary midpoints per band level and place labels spaced ≥120 px apart
     // so they never crowd together. A small white knockout behind each label keeps it
@@ -175,15 +242,16 @@ function renderMap(sk, buf) {
     const ELEV_STEP     = 100; // metres per band
 
     buf.push();
-    buf.textFont('monospace');
-    buf.textSize(7.5);
+    //buf.textFont('monospace');
+    //buf.textSize(7.5);
     buf.textAlign(buf.CENTER, buf.CENTER);
 
     // For each band transition level (0→1, 1→2 … 12→13) collect candidate positions
     for (let level = 0; level < N_BANDS - 1; level++) {
-        const elevM  = (level + 1) * ELEV_STEP; // e.g. 100, 200 … 1300
-        const label  = elevM + 'm';
-        const placed = []; // {x, y} of labels already drawn for this level
+        const elevM   = (level + 1) * ELEV_STEP; // e.g. 100, 200 … 1300
+        const isIndex = elevM % 500 === 0
+        const label   = elevM + 'm';
+        const placed  = []; // {x, y} of labels already drawn for this level
 
         // Scan right-boundaries first, then bottom-boundaries
         const candidates = [];
@@ -224,13 +292,16 @@ function renderMap(sk, buf) {
             if (tooClose) continue;
 
             // White knockout rectangle
-            const tw = 20, th = 9;
+            const tw = isIndex ? 26 : 20;
+            const th = isIndex ? 10 : 9;
             buf.noStroke();
-            buf.fill(255, 255, 255, 145);
+            buf.fill(255, 255, 255, isIndex ? 175 : 140);
             buf.rect(x - tw / 2, y - th / 2, tw, th, 1);
 
             // Label text — dark brown, readable on any band colour
-            buf.fill(40, 28, 12, 200);
+            buf.textFont('monospace');
+            buf.textSize(isIndex ? 8.5 : 7.5);
+            buf.fill(isIndex ? buf.color(20, 12, 4, 230) : buf.color(40, 28, 12, 190));
             buf.noStroke();
             buf.text(label, x, y);
 
@@ -251,10 +322,11 @@ function drawHoldIndicator(sk, x, y, t, isDepress) {
     const col = sk.lerpColor(c1, c2, t);
 
     sk.push();
-    sk.noFill(); sk.stroke(0,0,0,80); sk.strokeWeight(5); sk.circle(x, y, radius*2);
+    sk.noFill(); 
+    sk.stroke(0,0,0,80); sk.strokeWeight(5); sk.circle(x, y, radius*2);
 
     sk.stroke(isDepress ? sk.color(100,180,255,18) : sk.color(255,255,200,18));
-    sk.strokeWeight(1); sk.circle(x, y, SIGMA_PX*2);
+    sk.strokeWeight(1); sk.circle(x, y, sigmaPx*2);
 
     sk.stroke(col); sk.strokeWeight(3);
     sk.arc(x, y, radius*2, radius*2, -sk.HALF_PI, -sk.HALF_PI + t*sk.TWO_PI);
@@ -274,7 +346,7 @@ function drawHoverPreview(sk, x, y, isDepress) {
     sk.push();
     sk.noFill();
     sk.stroke(isDepress ? sk.color(100,180,255,40) : sk.color(255,255,200,40));
-    sk.strokeWeight(1); sk.circle(x, y, SIGMA_PX*2);
+    sk.strokeWeight(1); sk.circle(x, y, sigmaPx*2);
     sk.noStroke();
     sk.fill(isDepress ? sk.color(100,180,255,70) : sk.color(255,255,200,70));
     sk.circle(x, y, 5);
@@ -286,6 +358,7 @@ function drawHoverPreview(sk, x, y, isDepress) {
 // ─────────────────────────────────────────────
 function buildLegend() {
     const el = document.getElementById('legend');
+    if(!el) return
     PALETTE.forEach(([r,g,b], i) => {
         const d = document.createElement('div');
         d.className = 'ls';
@@ -293,6 +366,17 @@ function buildLegend() {
         d.title = BAND_NAMES[i];
         el.appendChild(d);
     });
+}
+
+// Brush label helper
+function brushLabel(px){
+
+    if(px <= 36) return 'Brush: XS'
+    if(px <= 52) return 'Brush: S'
+    if(px <= 72) return 'Brush: M'
+    if(px <= 96) return 'Brush: L'
+    return 'Brush: XL'
+
 }
 
 // ─────────────────────────────────────────────
@@ -312,8 +396,8 @@ new p5(function(sk) {
     function canvasPos(clientX, clientY) {
         // Convert a clientX/Y into canvas-space coordinates,
         // accounting for any CSS scaling (max-width: 100%).
-        const cnvEl = sk.canvas;
-        const rect  = cnvEl.getBoundingClientRect();
+        const rect  = sk.canvas.getBoundingClientRect();
+        if(!rect.width || !rect.height) return {x: 0, y: 0}
         return {
             x: (clientX - rect.left) * (W / rect.width),
             y: (clientY - rect.top)  * (H / rect.height),
@@ -337,6 +421,7 @@ new p5(function(sk) {
         el.addEventListener('touchstart', (e) => {
             e.preventDefault(); // prevent scroll on canvas only
             const t0 = e.touches[0];
+            if(!t0) return
             const {x, y} = canvasPos(t0.clientX, t0.clientY);
             holdStart = performance.now();
             holdX = x; holdY = y;
@@ -358,23 +443,35 @@ new p5(function(sk) {
         });
 
         // Wire up buttons now that p5 is ready
-        document.getElementById('btn-generate').addEventListener('click', () => doGenerate(sk));
-        document.getElementById('btn-undo').addEventListener('click', doUndo);
-        document.getElementById('btn-clear').addEventListener('click', doClear);
+        document.getElementById('btn-generate')?.addEventListener('click', () => doGenerate(sk));
+        document.getElementById('btn-undo')?.addEventListener('click', doUndo);
+        document.getElementById('btn-clear')?.addEventListener('click', doClear);
+        document.getElementById('btn-export')?.addEventListener('click', () => doExport(sk))
 
-        document.getElementById('btn-peak').addEventListener('click', () => {
+        document.getElementById('btn-peak')?.addEventListener('click', () => {
             state.mode = 'peak';
-            document.getElementById('btn-peak').classList.add('active');
-            document.getElementById('btn-depression').classList.remove('active');
+            document.getElementById('btn-peak')?.classList.add('active');
+            document.getElementById('btn-depression')?.classList.remove('active');
         });
 
-        document.getElementById('btn-depression').addEventListener('click', () => {
+        document.getElementById('btn-depression')?.addEventListener('click', () => {
             state.mode = 'depression';
-            document.getElementById('btn-depression').classList.add('active');
-            document.getElementById('btn-peak').classList.remove('active');
+            document.getElementById('btn-depression')?.classList.add('active');
+            document.getElementById('btn-peak')?.classList.remove('active');
         });
+
+        // Brush slider
+        const slider = document.getElementById("brush-slider")
+        const label = document.getElementById("brush-label")
+        slider?.addEventListener('input', () => {
+            sigmaPx = parseInt(slider.value, 10)
+            if(label) label.textContent = brushLabel(sigmaPx)
+        })
 
         doGenerate(sk);
+
+        // Mark as touch device on first touchstart (permanent — mixed input is rare)
+        //sk.canvas.addEventListener('touchstart', () => { isTouch = true; }, { once: true });
     };
 
     sk.draw = function() {

@@ -4,6 +4,7 @@
     padding: 0; 
 }
 
+
 body {
 
     background: #0d0c09;
@@ -11,6 +12,7 @@ body {
     flex-direction: column;
     align-items: center;
     width: 100%;
+    font-family: Arial, Helvetica, sans-serif;
 
 }
 
@@ -20,7 +22,7 @@ main{
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 24px 12px 40px;
+    padding: 24px 12px 80px;
     min-height: 100vh;
     font-family: 'Georgia', serif;
 
@@ -41,7 +43,7 @@ h1 {
 
     display: flex;
     gap: 6px;
-    margin-bottom: 13px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
     justify-content: center;
     align-items: stretch;
@@ -133,6 +135,66 @@ h1 {
     background: #1e1a0a; 
 
 }
+
+/* -- Brush size row -- */
+#brush-row{
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 10;
+
+}
+
+#brush-label{
+
+    font: normal 9px/1 'Georgia', serif;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #4a3e20;
+    min-width: 56px; /* stops layout shifting as text changes */
+
+}
+
+#brush-slider{
+
+    -webkit-appearance: none;
+    appearance: none;
+    width: 130px;
+    height: 2px;
+    background: #2e2810;
+    border-radius: 1px;
+    outline: none;
+    cursor: pointer;
+
+}
+
+#brush-slider::-moz-range-thumb{
+
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #6a5828;
+    border: 1px solid #2e2810;
+    cursor: pointer;
+
+}
+
+#brush-slider:hover::-webkit-slider-thumb{
+
+    background: #b8a060;
+
+}
+
+#brush-slider:hover::-moz-range-thumb {
+
+    background: #b8a060;
+
+}
+
+/* -- */
 
 #canvas-wrap {
 
