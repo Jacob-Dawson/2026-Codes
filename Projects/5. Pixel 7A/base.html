@@ -5,9 +5,96 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="css/base.css">
-        <title>Main Temp</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/2.0.5/p5.min.js" integrity="sha512-jOTg6ikYiHx1LvbSOucnvZi4shXbaovZ91+rfViIiUFLgAJK+k1oQtGEaLvDB8rsZwEfUksTgmhrxdvEDykuzQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <title>Google Pixel 7a</title>  
     </head>
     <body>
+        <main>
+            <section id="description">
+                <p>This is a drawing of my current phone: A Google Pixel 7a.</p>
+            </section>
+            <section id="input-section">
+                <label>
+                    <input class="filter" type="checkbox" data-tech="css" checked>
+                    CSS
+                </label>
+                <label>
+                    <input class="filter" type="checkbox" data-tech="svg" checked>
+                    SVG
+                </label>
+                <label>
+                    <input class="filter" type="checkbox" data-tech="canvas" checked>
+                    Canvas
+                </label>
+                <label>
+                    <input class="filter" type="checkbox" data-tech="p5" checked>
+                    p5
+                </label>
+            </section>
+            <section id="output-section">
+                <div class="phone--css">
+                    <div id="myCSS">
+                        <div id="front-view">
+                            <div class="phone-base">
+                                <div id="screen-base"></div>
+                                <div id="front-camera"></div>
+                                <div id="front-view-buttons" class="buttons">
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="back-view">
+                            <div class="phone-base">
+                                <div id="camera-bar">
+                                    <div></div>
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                                <div id="back-view-buttons" class="buttons">
+                                    <div></div>
+                                    <div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="phone--svg">
+                    <svg id="mySVG" width="300" height="300">
+                        <g transform="translate(24.88,45.5)">
+                            <rect x="0" y="0" height="209" width="100.24" rx="7.56" fill="rgb(38, 38, 40)"/>
+                            <rect x="6.4" y="7.34" height="194.29" width="87.45" rx="6.19" fill="rgb(20, 20, 22)"/>
+                            <circle cx="50.12" cy="16.5" r="3.44" fill="rgba(255,255,255,0.55)"/>
+                            <g transform="translate(100.24,0)" fill="rgb(38, 38, 40)">
+                                <rect x="-1" y="55" width="4.13" height="19.25" rx="2"/>
+                                <rect x="-1" y="96.25" width="4.13" height="35.75" rx="2"/>
+                            </g>
+                        </g>
+                        <g transform="translate(174.88,45.5)">
+                            <rect x="0" y="0" height="209" width="100.24" rx="7.56" fill="rgb(38, 38, 40)"/>
+                            <g transform="translate(0,23.38)">
+                                <rect x="0" y="0" width="100.24" height="23.38" fill="rgb(152, 152, 155)"/>
+                                <circle cx="13.75" cy="11.69" r="4.125" fill="rgb(100,100,100)" stroke="black"/>
+                                <circle cx="26.13" cy="11.69" r="4.125" fill="rgb(100,100,100)" stroke="black"/>
+                                <circle cx="79.62" cy="11.69" r="4.125" fill="rgb(200,200,200)" stroke="black"/>
+                            </g>
+                            <g transform="translate(-4.13,0)" fill="rgb(38, 38, 40)">
+                                <rect x="1" y="55" width="4.13" height="19.25" rx="2"/>
+                                <rect x="1" y="96.25" width="4.13" height="35.75" rx="2"/>
+                            </g>
+                        </g>
+                    </svg>
+                </div>
+                <div class="phone--canvas">
+                    <canvas id="myCanvas" width="600" height="600">
+                        Canvas is not supported in your browser.
+                    </canvas>
+                </div>
+                <div class="phone--p5">
+                    <div id="myP5"></div>
+                </div>
+            </section>
+        </main>
         <div id="footer">
             <div id="footerContainer">
                 <div id="profilePic">
@@ -23,5 +110,8 @@
                 </div>
             </div>
         </div>
+        <script type="module" src="./js/base.js"></script>
+        <script type="module" src="./js/canvas.js"></script>
+        <script type="module" src="./js/p5Sketch.js"></script>
     </body>
 </html>
