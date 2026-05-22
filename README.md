@@ -1,0 +1,1 @@
+My small passion programming projects for 2026. Every month there will be a new project released on here.
