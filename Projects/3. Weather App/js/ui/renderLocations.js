@@ -15,8 +15,12 @@ export function createLocationCard(location){
     const tempMax = location.temp?.tempMax ?? null
     const tempMin = location.temp?.tempMin ?? null
 
+    const coordsAttrs = (location.lat != null && location.lon != null)
+        ? `data-lat="${location.lat}" data-lon="${location.lon}"`
+        : ""
+
     return `
-        <div class="location-card" data-name="${name}">
+        <div class="location-card" data-name="${name}" ${coordsAttrs}>
             <div>
                 <img src="${icon}" alt="${conditionText}">
             </div>
@@ -59,7 +63,7 @@ export function renderLocations(current,saved,onSelectLocation){
 
             currentCard.addEventListener("click", () => {
 
-                if(onSelectLocation) onSelectLocation(current.name)
+                if(onSelectLocation) onSelectLocation(current.lat, current.lon, current.name)
 
             })
 
@@ -99,11 +103,11 @@ export function renderLocations(current,saved,onSelectLocation){
 
         card.addEventListener("click", () => {
 
-            const locationName = card.dataset.name
+            const { name, lat, lon } = card.dataset
 
-            if(locationName){
+            if(name){
 
-                onSelectLocation(locationName)
+                onSelectLocation(lat, lon, name)
 
             }
         })

@@ -17,6 +17,7 @@ import { applyWeatherTheme } from "./ui/applyWeatherTheme.js"
 import { openLocations, closeLocations } from "./ui/locationsSection.js"
 import { renderLocations } from "./ui/renderLocations.js"
 import { openSearchOverlay, closeSearchOverlay } from "./ui/searchOverlay.js";
+import { localPlaces } from "./data/localPlaces.js";
 
 // state
 const state = {
@@ -77,7 +78,6 @@ window.addEventListener("load", async () => {
         state.savedLocations = loadedLocations
 
         renderLocations(state.currentLocation, state.savedLocations, handleLocationSelect)
-        setupContextMenu(state.savedLocations, renderLocationsWrapper, state.selectedLocation || state.currentLocation, STORAGE_KEY, handleLocationSelect, updateSavedLocationsOrder);
 
     } catch (err){
 
@@ -112,20 +112,22 @@ document.addEventListener("DOMContentLoaded", () => {
     searchInputOverlay.addEventListener("input",onSearchInput)
     searchResultsOverlay.addEventListener("click",onSearchSelect)
 
+    setupContextMenu(
+        () => state.savedLocations,
+        renderLocationsWrapper,
+        () => state.currentLocation,
+        STORAGE_KEY,
+        handleLocationSelect,
+        updateSavedLocationsOrder
+    )
+
 })
 
 // Wrapper for consistent rendering
 function renderLocationsWrapper(){
 
     renderLocations(state.currentLocation, state.savedLocations, handleLocationSelect);
-    setupContextMenu(
-        state.savedLocations,
-        renderLocationsWrapper,
-        state.currentLocation,
-        STORAGE_KEY,
-        handleLocationSelect,
-        updateSavedLocationsOrder
-    );
+
 }
 
 // syncs savedlocations order
@@ -158,7 +160,9 @@ async function loadSavedLocationsWeather(locations){
             const weather = formatWeatherData(data)
 
             updatedLocations.push({
-                name: weather.city,
+                name: loc.name,
+                lat: weather.lat,
+                lon: weather.lon,
                 temp: {
                     temp: weather.temperatureC,
                     tempMin: weather.minTempC,
@@ -191,18 +195,23 @@ async function loadSavedLocationsWeather(locations){
 }
 
 // Load Weather for a location
-async function loadWeather(locationName){
+async function loadWeather(lat, lon, name){
 
     showloader()
 
     try{
 
-        const data = await getWeather(locationName)
+        const data = (lat != null && lon != null)
+            ? await fetchWeatherByCoords(lat, lon)
+            : await getWeather(name)
+
         const weather = formatWeatherData(data)
 
         renderAllWeatherSections(weather, data)
         state.selectedLocation = {
-            name: weather.city,
+            name: name ?? weather.city,
+            lat: lat != null ? Number(lat) : weather.lat,
+            lon: lon != null ? Number(lon) : weather.lon,
             temp: {
                 temp: weather.temperatureC,
                 tempMin: weather.minTempC,
@@ -217,7 +226,7 @@ async function loadWeather(locationName){
 
     } catch (err){
 
-        console.error("Failed to load weather for",locationName,err)
+        console.error("Failed to load weather for",locationName,lat,lon,name,err)
 
     } finally{
 
@@ -239,6 +248,8 @@ async function loadWeatherFromCoords(lat, lon) {
         renderAllWeatherSections(weather, data)
         state.currentLocation = {
             name: weather.city,
+            lat: weather.lat,
+            lon: weather.lon,
             temp: {
                 temp: weather.temperatureC,
                 tempMin: weather.minTempC,
@@ -280,9 +291,9 @@ function renderAllWeatherSections(weather,rawData){
 }
 
 // Handle Location Select
-async function handleLocationSelect(locationName){
+async function handleLocationSelect(lat, lon, name){
 
-    await loadWeather(locationName)
+    await loadWeather(lat, lon, name)
     closeLocations()
 
 }
@@ -294,10 +305,17 @@ async function onSearchInput(){
 
     if(!query || query.length < 3) return
 
-    const locations = await searchLocations(query)
+    const apiResults = await searchLocations(query)
+
+    const localMatches = localPlaces.filter(loc => 
+        loc.name.toLowerCase().includes(query.toLowerCase())
+    )
+
+    const locations = [...localMatches, ...apiResults]
+    
     searchResultsOverlay.innerHTML = locations.map(loc => 
-        `<li data-city="${loc.name}">
-            ${loc.name}, ${loc.country}
+        `<li data-name="${loc.name}" data-lat="${loc.lat}" data-lon="${loc.lon}">
+            ${loc.name}${loc.region ? ", " + loc.region : ""}, ${loc.country}
         </li>`
     ).join("")
 
@@ -305,20 +323,25 @@ async function onSearchInput(){
 
 async function onSearchSelect(e){
 
-    const city = e.target.dataset.city
-    if(!city) return
+    const li = e.target.closest("li")
+    if(!li) return
+
+    const { name, lat, lon } = li.dataset
+    if(!name || !lat || !lon) return
 
     // no dupes
-    if(state.savedLocations.some(loc => loc.name === city)){
+    if(state.savedLocations.some(loc => loc.name === name)){
         closeSearchOverlay()
         return
     }
 
-    const data = await getWeather(city)
+    const data = await fetchWeatherByCoords(lat, lon)
     const weather = formatWeatherData(data)
 
     const newLocation = {
-        name: weather.city,
+        name: name,
+        lat: weather.lat,
+        lon: weather.lon,
         temp: {
             temp: weather.temperatureC,
             tempMin: weather.minTempC,

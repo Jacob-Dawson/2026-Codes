@@ -15,6 +15,8 @@ export function formatWeatherData(data){
     return {
         city: data.location.name,
         country: data.location.country,
+        lat: data.location.lat,
+        lon: data.location.lon,
         temperatureC: data.current.temp_c,
         temperatureF: data.current.temp_f,
         condition: data.current.condition.text,

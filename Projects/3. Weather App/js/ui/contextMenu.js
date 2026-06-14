@@ -1,4 +1,4 @@
-export function setupContextMenu(savedLocations, renderLocations, currentLocation, STORAGE_KEY, handleLocationSelect, updateSavedLocationsOrder) {
+export function setupContextMenu(getSavedLocations, renderLocations, getCurrentLocation, STORAGE_KEY, handleLocationSelect, updateSavedLocationsOrder) {
 
     const contextMenu = document.querySelector("#context-menu")
     const removeBtn = document.querySelector("#remove-city-btn")
@@ -13,18 +13,8 @@ export function setupContextMenu(savedLocations, renderLocations, currentLocatio
 
     let currentRightClickedLocation = null;
 
-    function updateLocations() {
-        if (typeof updateSavedLocationsOrder === "function") {
-            updateSavedLocationsOrder(savedLocations);
-        }
-        renderLocations(
-            savedLocations.find(loc => loc.name === currentRightClickedLocation) || currentLocation,
-            savedLocations,
-            handleLocationSelect
-        );
-    }
 
-    function getIndex() {
+    function getIndex(savedLocations) {
         return savedLocations.findIndex(loc => loc.name === currentRightClickedLocation);
     }
 
@@ -42,61 +32,44 @@ export function setupContextMenu(savedLocations, renderLocations, currentLocatio
         contextMenu.style.left = `${e.pageX}px`;
         contextMenu.classList.remove("hidden");
 
-        const index = getIndex();
+        const savedLocations = getSavedLocations();
+        const index = getIndex(savedLocations);
         moveUpBtn.style.display = index <= 0 ? "none" : "block";
         moveDownBtn.style.display = index >= savedLocations.length - 1 ? "none" : "block";
     });
 
     removeBtn.addEventListener("click", () => {
-        const index = getIndex();
+        const savedLocations = getSavedLocations()
+        const index = getIndex(savedLocations);
         if(index > -1){
             savedLocations.splice(index, 1);
             // pick new currentRightClickedLocation safely
-            currentRightClickedLocation = savedLocations[index] ? savedLocations[index].name : savedLocations[0]?.name || null;
-            updateLocations();
+            currentRightClickedLocation = savedLocations[index]?.name ?? savedLocations[0]?.name ?? null;
+            updateSavedLocationsOrder(savedLocations)
+            renderLocations();
         }
         contextMenu.classList.add("hidden");
     });
 
     moveUpBtn.addEventListener("click", () => {
-        const index = getIndex();
+        const savedLocations = getSavedLocations()
+        const index = getIndex(savedLocations);
         if(index > 0){
             // swap
             [savedLocations[index - 1], savedLocations[index]] = [savedLocations[index], savedLocations[index - 1]];
-
-            // always pick the moved item from the array itself
-            currentRightClickedLocation = savedLocations[index - 1].name;
-
-            // render the array with correct reference
-            renderLocations(
-                savedLocations.find(loc => loc.name === currentRightClickedLocation),
-                savedLocations,
-                handleLocationSelect
-            );
-
-            if (typeof updateSavedLocationsOrder === "function") {
-                updateSavedLocationsOrder(savedLocations);
-            }
+            updateSavedLocationsOrder(savedLocations)
+            renderLocations()
         }
         contextMenu.classList.add("hidden");
     });
 
     moveDownBtn.addEventListener("click", () => {
-        const index = getIndex();
+        const savedLocations = getSavedLocations()
+        const index = getIndex(savedLocations);
         if(index >= 0 && index < savedLocations.length - 1){
             [savedLocations[index + 1], savedLocations[index]] = [savedLocations[index], savedLocations[index + 1]];
-
-            currentRightClickedLocation = savedLocations[index + 1].name;
-
-            renderLocations(
-                savedLocations.find(loc => loc.name === currentRightClickedLocation),
-                savedLocations,
-                handleLocationSelect
-            );
-
-            if (typeof updateSavedLocationsOrder === "function") {
-                updateSavedLocationsOrder(savedLocations);
-            }
+            updateSavedLocationsOrder(savedLocations)
+            renderLocations()
         }
         contextMenu.classList.add("hidden");
     });
