@@ -20,8 +20,23 @@ export function renderGrid(
     ctx.save()
     ctx.translate(offset.x, offset.y)
 
+    const specialTiles: Tile[] = []
+
     for(const tile of grid.tiles.values()){
+        if(tile.col === grid.entranceCol || tile.col === grid.exitCol){
+
+            specialTiles.push(tile)
+            continue
+
+        }
         drawTile(ctx, tile, grid)
+    }
+
+    // Drawn last so their colored outline never gets overwritten by an adjacent column's stroke
+    for(const tile of specialTiles){
+
+        drawTile(ctx, tile, grid)
+
     }
 
     ctx.restore()

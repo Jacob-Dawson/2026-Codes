@@ -62,31 +62,31 @@ export function addColumns(grid: HexGrid, count: number = COLUMNS_PER_WAVE): voi
 
 function generateColumn(tiles: Map<string, Tile>, col: number, rows: number, plain: boolean){
 
-    const colTiles: Tile[] = []
-
     for(let row = 0; row < rows; row++){
 
         const hex = colRowToAxial(col, row)
-        const tile: Tile = { hex, col, row, type: TileType.Normal}
+        const tile: Tile = { hex, col, row, type: TileType.Normal }
+
+        if(!plain){
+
+            const roll = Math.random()
+            if(roll < FRAGMENT_RATIO){
+
+                tile.type = TileType.Fragment
+                tile.fragmentValue = FRAGMENT_VALUE
+
+            } else if(roll < FRAGMENT_RATIO + BLOCKED_RATIO){
+
+                tile.type = TileType.Blocked
+
+            }
+
+        }
+
         tiles.set(hexKey(hex), tile)
-        colTiles.push(tile)
 
     }
-
-    if(plain) return
-
-    shuffle(colTiles)
-    const fragmentCount = Math.floor(colTiles.length * FRAGMENT_RATIO)
-    const blockedCount = Math.floor(colTiles.length * BLOCKED_RATIO)
-
-    colTiles.slice(0, fragmentCount).forEach((tile) => {
-        tile.type = TileType.Fragment
-        tile.fragmentValue = FRAGMENT_VALUE
-    })
-    colTiles.slice(fragmentCount, fragmentCount + blockedCount).forEach((tile) => {
-        tile.type = TileType.Blocked
-    })
-
+    
 }
 
 // Odd-r offset layout converted to axial
