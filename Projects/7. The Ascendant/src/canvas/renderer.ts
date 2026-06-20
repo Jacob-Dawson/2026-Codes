@@ -1,8 +1,9 @@
 import { type HexGrid, type Tile, TileType } from "../game/hex/grid";
 import { hexToPixel, hexCorners } from "../game/hex/coordinates";
+import { type Path } from "../game/hex/path"
+import { HEX_SIZE } from "./constants";
 
-const HEX_SIZE = 32 // center to corner distance in pixels
-const TILE_COLOURS: Record<string, string> = {
+const TILE_COLORS: Record<string, string> = {
     [TileType.Normal]: "#1c1c1e",
     [TileType.Fragment]: "#3a8f6b",
     [TileType.Blocked]: "#4a4a4a"
@@ -11,6 +12,7 @@ const TILE_COLOURS: Record<string, string> = {
 const TILE_STROKE = "#3a3a3c"
 const ENTRANCE_STROKE = "#c0392b"
 const EXIT_STROKE = "#2e86de"
+const PATH_COLOR = "#f4c542"
 
 export function renderGrid(
     ctx: CanvasRenderingContext2D,
@@ -54,7 +56,7 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile, grid: HexGrid){
     })
     ctx.closePath()
 
-    ctx.fillStyle = TILE_COLOURS[tile.type]
+    ctx.fillStyle = TILE_COLORS[tile.type]
     ctx.fill()
 
     let strokeColor = TILE_STROKE
@@ -70,5 +72,40 @@ function drawTile(ctx: CanvasRenderingContext2D, tile: Tile, grid: HexGrid){
     ctx.strokeStyle = strokeColor
     ctx.lineWidth = lineWidth
     ctx.stroke()
+
+}
+
+export function renderPath(
+    ctx: CanvasRenderingContext2D,
+    path: Path,
+    offset: { x: number; y: number }
+) {
+
+    if(path.hexes.length === 0) return
+
+    ctx.save()
+    ctx.translate(offset.x, offset.y)
+
+    ctx.beginPath()
+    path.hexes.forEach((hex, i) => {
+        const center = hexToPixel(hex, HEX_SIZE)
+        if(i === 0) ctx.moveTo(center.x, center.y)
+        else ctx.lineTo(center.x, center.y)
+    })
+
+    ctx.strokeStyle = PATH_COLOR
+    ctx.lineWidth = 6
+    ctx.lineCap = "round"
+    ctx.lineJoin = "round"
+    ctx.stroke()
+
+    const last = path.hexes[path.hexes.length - 1]
+    const lastCenter = hexToPixel(last, HEX_SIZE)
+    ctx.beginPath()
+    ctx.arc(lastCenter.x, lastCenter.y, 6, 0, Math.PI * 2)
+    ctx.fillStyle = PATH_COLOR
+    ctx.fill()
+
+    ctx.restore()
 
 }

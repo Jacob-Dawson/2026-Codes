@@ -1,9 +1,11 @@
-import { type Hex, hexEquals, hexKey, hexNeighbors } from "./coordinates"
+import { type Hex, hexEquals, hexKey, HEX_DIRECTIONS } from "./coordinates"
 import { type HexGrid, TileType, getTile } from "./grid"
 
 export interface Path {
     hexes: Hex[] // ordered, entry -> exit
 }
+
+const FORWARD_DIRECTIONS = [HEX_DIRECTIONS[0], HEX_DIRECTIONS[1], HEX_DIRECTIONS[5]] // E, NE, SE
 
 export function createPath(startHex: Hex): Path{
     return {hexes: [startHex]}
@@ -11,14 +13,19 @@ export function createPath(startHex: Hex): Path{
 
 export function canExtendTo(grid: HexGrid, path: Path, candidate: Hex): boolean {
     const last = path.hexes[path.hexes.length - 1]
-    const isNeighbor = hexNeighbors(last).some((n) => hexEquals(n, candidate))
-    if(!isNeighbor) return false
+
+    const isForwardNeighbor = FORWARD_DIRECTIONS.some(
+        (dir) => candidate.q === last.q + dir.q && candidate.r === last.r + dir.r
+    )
+    if(!isForwardNeighbor) return false
 
     const alreadyUsed = path.hexes.some((h) => hexEquals(h, candidate))
     if(alreadyUsed) return false
 
     const tile = getTile(grid, candidate)
     if(!tile || tile.type === TileType.Blocked) return false
+
+    if(!canReachEntrance(grid, path, candidate)) return false
 
     return true
 }
@@ -51,8 +58,11 @@ export function isValidPath(grid: HexGrid, path: Path): boolean {
         if(!tile || tile.type === TileType.Blocked) return false
 
         if(i > 0){
-            const isNeighbor = hexNeighbors(path.hexes[i - 1]).some((n) => hexEquals(n, hex))
-            if(!isNeighbor) return false
+            const prev = path.hexes[i - 1]
+            const isForwardNeighbor = FORWARD_DIRECTIONS.some(
+                (dir) => hex.q === prev.q + dir.q && hex.r === prev.r + dir.r
+            )
+            if(!isForwardNeighbor) return false
         }
 
     }
@@ -71,4 +81,40 @@ export function collectFragments(grid: HexGrid, path: Path): number {
 // True once grid.addColumns() has run and the path no longer reaches the entrance
 export function needsExtension(grid: HexGrid, path: Path): boolean {
     return !isComplete(grid, path)
+}
+
+// Look ahead check: from 'start', is there still some sequence of forward only moves that can reach the entrance column, without crossing blocked tiles or tiles already used by the path? Stops the player from drawing themselves into a dead end.
+
+function canReachEntrance(grid: HexGrid, path: Path, start: Hex): boolean {
+
+    const used = new Set(path.hexes.map(hexKey))
+
+    const visited = new Set<string>([hexKey(start)])
+    const queue: Hex[] = [start]
+
+    while(queue.length > 0){
+
+        const current = queue.shift()
+        if(!current) break
+        const tile = getTile(grid, current)
+        if(tile?.col === grid.entranceCol) return true
+
+        for(const dir of FORWARD_DIRECTIONS){
+
+            const next: Hex = { q: current.q + dir.q, r: current.r + dir.r }
+            const key = hexKey(next)
+            if(visited.has(key) || used.has(key)) continue
+
+            const nextTile = getTile(grid, next)
+            if(!nextTile || nextTile.type === TileType.Blocked) continue
+
+            visited.add(key)
+            queue.push(next)
+
+        }
+
+    }
+
+    return false
+
 }
